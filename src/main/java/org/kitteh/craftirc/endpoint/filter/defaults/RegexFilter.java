@@ -23,12 +23,12 @@
  */
 package org.kitteh.craftirc.endpoint.filter.defaults;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.filter.Filter;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.util.loadable.Load;
 import org.kitteh.craftirc.util.loadable.Loadable;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -105,20 +105,20 @@ public class RegexFilter extends Filter {
     @Override
     protected void load(@Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
         final String pattern;
-        if ((pattern = data.getNode("pattern").getString()) == null) {
+        if ((pattern = data.node("pattern").getString()) == null) {
             throw new CraftIRCInvalidConfigException("Regex pattern requires a 'pattern' defined");
         }
         this.pattern = Pattern.compile(pattern);
-        if ((this.action = Action.getByName(data.getNode("action").getString())) == null) {
+        if ((this.action = Action.getByName(data.node("action").getString())) == null) {
             throw new CraftIRCInvalidConfigException("Regex pattern requires an 'action' defined. Valid action types: " + Action.names);
         }
-        this.match = Match.getByName(data.getNode("match").getString());
+        this.match = Match.getByName(data.node("match").getString());
         if (this.match == null) {
             this.match = Match.PARTIAL;
         }
         switch (this.action) {
             case REPLACE:
-                if ((this.replacement = data.getNode("replacement").getString()) == null) {
+                if ((this.replacement = data.node("replacement").getString()) == null) {
                     throw new CraftIRCInvalidConfigException("Regex pattern replace action requires 'replacement' to be set");
                 }
                 break;

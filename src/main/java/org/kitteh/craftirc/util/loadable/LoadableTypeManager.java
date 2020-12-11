@@ -23,10 +23,10 @@
  */
 package org.kitteh.craftirc.util.loadable;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.irc.client.library.util.Sanity;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Constructor;
@@ -108,11 +108,11 @@ public abstract class LoadableTypeManager<Type extends Loadable> {
 
     protected void loadList(@Nonnull List<? extends ConfigurationNode> list) {
         for (final ConfigurationNode node : list) {
-            if (node.getNode("type").isVirtual()) {
+            if (node.node("type").virtual()) {
                 this.processInvalid("No type set", node);
                 continue;
             }
-            final String type = node.getNode("type").getString();
+            final String type = node.node("type").getString();
             final LoadableLoadout loadout = this.types.get(type);
             if (loadout == null) {
                 List<ConfigurationNode> unregged = this.unRegistered.computeIfAbsent(type, k -> new LinkedList<>());
@@ -142,8 +142,8 @@ public abstract class LoadableTypeManager<Type extends Loadable> {
         try {
             loaded = loadout.getConstructor().newInstance(args);
             for (LoadableField field : loadout.getFields()) {
-                ConfigurationNode node = data.getNode(field.getName());
-                if (!node.isVirtual()) {
+                ConfigurationNode node = data.node(field.getName());
+                if (!node.virtual()) {
                     field.getField().set(loaded, this.getByType(node, field.getField().getType()));
                 } else if (field.isRequired()) {
                     throw new CraftIRCInvalidConfigException(String.format("Missing required field '%s' for type '%s'", field.getName(), type));

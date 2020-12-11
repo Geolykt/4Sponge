@@ -23,12 +23,12 @@
  */
 package org.kitteh.craftirc.endpoint.filter.defaults;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.filter.Filter;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.util.loadable.Load;
 import org.kitteh.craftirc.util.loadable.Loadable;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedList;

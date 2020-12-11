@@ -23,13 +23,13 @@
  */
 package org.kitteh.craftirc.endpoint;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.defaults.IRCEndpoint;
 import org.kitteh.craftirc.endpoint.link.Link;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.util.loadable.LoadableTypeManager;
 import org.kitteh.irc.client.library.util.Pair;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;

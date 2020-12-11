@@ -23,8 +23,8 @@
  */
 package org.kitteh.craftirc.endpoint.link;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import org.kitteh.craftirc.CraftIRC;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedList;
@@ -49,21 +49,21 @@ public final class LinkManager {
         int noSource = 0;
         int noTarget = 0;
         for (final ConfigurationNode node : links) {
-            if (!node.hasMapChildren()) {
+            if (!node.isMap()) {
                 nonMap++;
                 continue;
             }
-            final String source = node.getNode("source").getString();
+            final String source = node.node("source").getString();
             if (source == null) {
                 noSource++;
                 continue;
             }
-            final String target = node.getNode("target").getString();
+            final String target = node.node("target").getString();
             if (target == null) {
                 noTarget++;
                 continue;
             }
-            List<? extends ConfigurationNode> filters = node.getNode("filters").getChildrenList();
+            List<? extends ConfigurationNode> filters = node.node("filters").childrenList();
             this.addLink(new Link(plugin, source, target, filters));
         }
         if (nonMap > 0) {

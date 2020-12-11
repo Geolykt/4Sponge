@@ -23,9 +23,9 @@
  */
 package org.kitteh.craftirc.util.loadable;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.Retention;

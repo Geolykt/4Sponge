@@ -23,12 +23,12 @@
  */
 package org.kitteh.craftirc.endpoint.filter;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.link.Link;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.util.loadable.Loadable;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,8 +65,8 @@ public abstract class Filter extends Loadable {
 
     @Override
     protected final void load(@Nonnull CraftIRC plugin, @Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
-        if (!data.getNode(FilterManager.Target.EndpointLoader).isVirtual()) {
-            this.loader = (Link.LinkFilterLoader) data.getNode(FilterManager.Target.EndpointLoader).getValue();
+        if (!data.node(FilterManager.Target.EndpointLoader).virtual()) {
+            this.loader = (Link.LinkFilterLoader) data.node(FilterManager.Target.EndpointLoader).raw(); // FIXME Check for CCE
             this.link = this.loader.getLink();
         }
         this.load(data);

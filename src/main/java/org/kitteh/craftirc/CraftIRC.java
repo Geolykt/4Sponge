@@ -24,8 +24,6 @@
 package org.kitteh.craftirc;
 
 import com.google.inject.Inject;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.EndpointManager;
 import org.kitteh.craftirc.endpoint.filter.FilterManager;
@@ -51,6 +49,8 @@ import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -145,30 +145,30 @@ public final class CraftIRC {
                 this.saveDefaultConfig(this.configDir);
             }
 
-            YAMLConfigurationLoader yamlConfigurationLoader = YAMLConfigurationLoader.builder().setPath(configFile.toPath()).build();
+            YamlConfigurationLoader yamlConfigurationLoader = YamlConfigurationLoader.builder().path(configFile.toPath()).build();
             ConfigurationNode root = yamlConfigurationLoader.load();
 
-            if (root.isVirtual()) {
+            if (root.virtual()) {
                 throw new CraftIRCInvalidConfigException("Config doesn't appear valid. Would advise starting from scratch.");
             }
 
-            ConfigurationNode repeatableFilters = root.getNode("repeatable-filters");
+            ConfigurationNode repeatableFilters = root.node("repeatable-filters");
 
-            ConfigurationNode botsNode = root.getNode("bots");
+            ConfigurationNode botsNode = root.node("bots");
             List<? extends ConfigurationNode> bots;
-            if (botsNode.isVirtual() || (bots = botsNode.getChildrenList()).isEmpty()) {
+            if (botsNode.virtual() || (bots = botsNode.childrenList()).isEmpty()) {
                 throw new CraftIRCInvalidConfigException("No bots defined!");
             }
 
-            ConfigurationNode endpointsNode = root.getNode("endpoints");
+            ConfigurationNode endpointsNode = root.node("endpoints");
             List<? extends ConfigurationNode> endpoints;
-            if (endpointsNode.isVirtual() || (endpoints = endpointsNode.getChildrenList()).isEmpty()) {
+            if (endpointsNode.virtual() || (endpoints = endpointsNode.childrenList()).isEmpty()) {
                 throw new CraftIRCInvalidConfigException("No endpoints defined! Would advise starting from scratch.");
             }
 
-            ConfigurationNode linksNode = root.getNode("links");
+            ConfigurationNode linksNode = root.node("links");
             List<? extends ConfigurationNode> links;
-            if (linksNode.isVirtual() || (links = linksNode.getChildrenList()).isEmpty()) {
+            if (linksNode.virtual() || (links = linksNode.childrenList()).isEmpty()) {
                 throw new CraftIRCInvalidConfigException("No links defined! How can your endpoints be useful?");
             }
 

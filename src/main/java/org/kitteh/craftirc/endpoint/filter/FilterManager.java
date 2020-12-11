@@ -23,7 +23,6 @@
  */
 package org.kitteh.craftirc.endpoint.filter;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.filter.defaults.AntiHighlight;
 import org.kitteh.craftirc.endpoint.filter.defaults.Colors;
@@ -31,6 +30,8 @@ import org.kitteh.craftirc.endpoint.filter.defaults.DataMapper;
 import org.kitteh.craftirc.endpoint.filter.defaults.RegexFilter;
 import org.kitteh.craftirc.endpoint.link.Link;
 import org.kitteh.craftirc.util.loadable.LoadableTypeManager;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
         this.registerType(Colors.class);
         this.registerType(DataMapper.class);
         this.registerType(RegexFilter.class);
-        if (!repeatables.isVirtual() && repeatables.hasMapChildren()) {
+        if (!repeatables.virtual() && repeatables.isMap()) {
             this.loadRepeatables(repeatables);
         }
     }
@@ -69,7 +70,7 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
         List<ConfigurationNode> updatedList = new ArrayList<>(list);
         for (int i = 0; i < updatedList.size(); i++) {
             ConfigurationNode node = updatedList.get(i);
-            if (!node.hasMapChildren()) {
+            if (!node.isMap()) {
                 if (this.repeatableObjects.containsKey(node.getString())) {
                     node = this.repeatableObjects.get(node.getString());
                     updatedList.set(i, node);
@@ -77,13 +78,17 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
                     continue;
                 }
             }
-            node.getNode(Target.EndpointLoader).setValue(link);
+            try {
+                node.node(Target.EndpointLoader).set(link); // FIXME fix
+            } catch (SerializationException e) {
+                e.printStackTrace();
+            }
         }
         super.loadList(updatedList);
     }
 
     private void loadRepeatables(@Nonnull ConfigurationNode repeatables) {
-        for (Map.Entry<Object, ? extends ConfigurationNode> entry : repeatables.getChildrenMap().entrySet()) {
+        for (Map.Entry<Object, ? extends ConfigurationNode> entry : repeatables.childrenMap().entrySet()) {
             if (!(entry.getKey() instanceof String)) {
                 // TODO log
                 continue;

@@ -23,11 +23,11 @@
  */
 package org.kitteh.craftirc.endpoint;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.link.Link;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.util.loadable.Loadable;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import javax.annotation.Nonnull;
 
@@ -76,9 +76,9 @@ public abstract class Endpoint extends Loadable {
 
     @Override
     protected final void load(@Nonnull CraftIRC plugin, @Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
-        this.name = data.getNode("name").getString();
-        final ConfigurationNode extra = data.getNode("extra");
-        if (!extra.isVirtual()) {
+        this.name = data.node("name").getString();
+        final ConfigurationNode extra = data.node("extra");
+        if (!extra.virtual()) {
             this.loadExtra(extra);
         }
     }
