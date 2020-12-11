@@ -39,10 +39,12 @@ public abstract class Endpoint extends Loadable {
      * Constant defining the message data value "MESSAGE_FORMAT".
      */
     public static final String MESSAGE_FORMAT = "MESSAGE_FORMAT";
+
     /**
      * Constant defining the message data value "MESSAGE_TEXT".
      */
     public static final String MESSAGE_TEXT = "MESSAGE_TEXT";
+
     /**
      * Constant defining the message data value "SENDER_NAME".
      */
@@ -128,4 +130,14 @@ public abstract class Endpoint extends Loadable {
         }
         this.receiveMessage(targetedMessage);
     }
+
+    /**
+     * Called after the Endpoint has been registered to initialise the callbacks that were made
+     */
+    public abstract void registerListener();
+
+    /**
+     * Called before the Endpoint is removed from memory to unregister the callbacks that were made
+     */
+    public abstract void unregisterListeners();
 }

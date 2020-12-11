@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.kitteh</groupId>
-    <artifactId>craftirc</artifactId>
+    <artifactId>craftirc-minestom</artifactId>
 
     <name>CraftIRC Minestom</name>
     <version>4.2.1-SNAPSHOT</version>

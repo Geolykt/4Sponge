@@ -1,0 +1,15 @@
+{
+  "entrypoint": " org.kitteh.craftirc.CraftIRC",
+  "name": "CraftIRC",
+  "version": "4.2.1-SNAPSHOT",
+  "authors": ["mbaxter", "geolykt"],
+  "externalDependencies": {
+    "repositories": [
+        {
+          "name": "Central",
+          "url": "https://repo1.maven.org/maven2/"
+        }
+    ],
+    "artifacts": []
+  }
+}

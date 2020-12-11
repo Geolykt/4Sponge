@@ -21,20 +21,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge;
+package org.kitteh.craftirc.minestom;
 
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.util.MinecraftPlayer;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.serializer.TextSerializers;
+
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.command.CommandSender;
+import net.minestom.server.entity.Player;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,32 +58,21 @@ public abstract class MinecraftEndpoint extends Endpoint {
 
     @Override
     protected void preProcessReceivedMessage(@Nonnull TargetedMessage message) {
-        Set<MinecraftPlayer> players = this.collectionToMinecraftPlayer(this.plugin.getGame().getServer().getOnlinePlayers());
+        Set<MinecraftPlayer> players = this.collectionToMinecraftPlayer(MinecraftServer.getConnectionManager().getOnlinePlayers());
         message.getCustomData().put(MinecraftEndpoint.RECIPIENT_NAMES, players);
     }
 
-    @Nullable
-    protected String getStringFromStringOrText(Object o) {
-        if (o instanceof String) {
-            return (String) o;
-        }
-        if (o instanceof Text) {
-            return TextSerializers.PLAIN.serialize((Text) o);
-        }
-        return null;
+    @Nonnull
+    protected Set<MinecraftPlayer> collectionToMinecraftPlayer(@Nonnull Collection<Player> collection) {
+        return collection.stream().map(player -> new MinecraftPlayer(((Player) player).getUsername(), ((Player) player).getUuid())).collect(Collectors.toCollection(HashSet::new));
     }
 
     @Nonnull
-    protected Set<MinecraftPlayer> collectionToMinecraftPlayer(@Nonnull Collection<? extends MessageReceiver> collection) {
-        return collection.stream().filter(source -> source instanceof Player).map(player -> new MinecraftPlayer(((Player) player).getName(), ((Player) player).getUniqueId())).collect(Collectors.toCollection(HashSet::new));
-    }
-
-    @Nonnull
-    protected Set<MinecraftPlayer> commandSourceIterableToMinecraftPlayer(@Nonnull Iterable<? extends CommandSource> iterable) {
+    protected Set<MinecraftPlayer> commandSourceIterableToMinecraftPlayer(@Nonnull Iterable<? extends CommandSender> iterable) {
         Set<MinecraftPlayer> set = new HashSet<>();
         iterable.forEach(source -> {
             if (source instanceof Player) {
-                set.add(new MinecraftPlayer(source.getName(), ((Player) source).getUniqueId()));
+                set.add(new MinecraftPlayer(((Player) source).getUsername(), ((Player) source).getUuid()));
             }
         });
         return set;

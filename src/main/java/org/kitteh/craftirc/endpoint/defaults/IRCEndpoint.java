@@ -91,4 +91,10 @@ public class IRCEndpoint extends Endpoint {
         this.channel = channelName;
         this.bot.addChannel(this, this.channel);
     }
+
+    @Override
+    public void registerListener() {}
+
+    @Override
+    public void unregisterListeners() {}
 }

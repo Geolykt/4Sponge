@@ -6,3 +6,5 @@
 
 # Maven makes this!
 /target
+/.classpath
+/.project

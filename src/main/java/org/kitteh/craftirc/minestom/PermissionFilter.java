@@ -21,7 +21,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge;
+package org.kitteh.craftirc.minestom;
 
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
@@ -29,7 +29,10 @@ import org.kitteh.craftirc.endpoint.filter.Filter;
 import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Load;
 import org.kitteh.craftirc.util.loadable.Loadable;
-import org.spongepowered.api.entity.living.player.Player;
+
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
+import net.minestom.server.permission.BasicPermission;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
@@ -43,11 +46,8 @@ import java.util.Optional;
 public final class PermissionFilter extends Filter {
     @Load
     private String permission;
-    private final CraftIRC plugin;
 
-    public PermissionFilter(@Nonnull CraftIRC plugin) {
-        this.plugin = plugin;
-    }
+    public PermissionFilter(@Nonnull CraftIRC plugin) {}
 
     /**
      * Gets the permission node being monitored.
@@ -55,8 +55,8 @@ public final class PermissionFilter extends Filter {
      * @return the permission node monitored
      */
     @Nonnull
-    public String getPermission() {
-        return this.permission;
+    public BasicPermission getPermission() {
+        return new BasicPermission(); // TODO use string based permissions!
     }
 
     @Override
@@ -67,7 +67,7 @@ public final class PermissionFilter extends Filter {
             Iterator<MinecraftPlayer> iterator = players.iterator();
             while (iterator.hasNext()) {
                 MinecraftPlayer minecraftPlayer = iterator.next();
-                Optional<Player> player = this.plugin.getGame().getServer().getPlayer(minecraftPlayer.getName());
+                Optional<Player> player = Optional.ofNullable(MinecraftServer.getConnectionManager().getPlayer(minecraftPlayer.getName()));
                 if (!player.isPresent() || !player.get().hasPermission(this.getPermission())) {
                     iterator.remove();
                 }

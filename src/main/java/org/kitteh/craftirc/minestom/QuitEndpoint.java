@@ -21,7 +21,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge;
+package org.kitteh.craftirc.minestom;
 
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
@@ -29,10 +29,11 @@ import org.kitteh.craftirc.endpoint.Message;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Loadable;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventCallback;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -53,15 +54,35 @@ public class QuitEndpoint extends MinecraftEndpoint {
         // NOOP
     }
 
-    @Listener
-    public void onChat(@Nonnull ClientConnectionEvent.Disconnect event, @First Player player) {
-        if (!event.getChannel().isPresent()) {
-            return;
-        }
+    public void onChat(@Nonnull PlayerDisconnectEvent event) {
         Map<String, Object> data = new HashMap<>();
-        Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
-        data.put(QuitEndpoint.SENDER_NAME, player.getName());
+        Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getPlayer().getInstance().getPlayers());
+        data.put(QuitEndpoint.SENDER_NAME, event.getPlayer().getUsername());
         data.put(QuitEndpoint.RECIPIENT_NAMES, recipients);
-        this.getPlugin().getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " left the game", data));
+        this.getPlugin().getEndpointManager().sendMessage(new Message(this, event.getPlayer().getUsername() + " left the game", data));
+    }
+
+    private EventCallback<PlayerDisconnectEvent> callback;
+
+    @Override
+    public void registerListener() {
+        if (callback == null) {
+            callback = (evt) -> {
+                this.onChat(evt);
+            };
+        }
+        MinecraftServer.getConnectionManager().addPlayerInitialization(player -> {
+            if (callback != null) {
+                player.addEventCallback(PlayerDisconnectEvent.class, callback);
+            }
+        });
+    }
+
+    @Override
+    public void unregisterListeners() {
+        for (Player p : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+            p.removeEventCallback(PlayerDisconnectEvent.class, callback);
+        }
+        callback = null;
     }
 }

@@ -23,7 +23,15 @@
  */
 package org.kitteh.craftirc;
 
-import com.google.inject.Inject;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.chat.ChatColor;
+import net.minestom.server.chat.ColoredText;
+import net.minestom.server.command.builder.Command;
+import net.minestom.server.command.builder.arguments.ArgumentString;
+import net.minestom.server.extensions.Extension;
+import net.minestom.server.permission.BasicPermission;
+import net.minestom.server.utils.time.TimeUnit;
+
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.EndpointManager;
 import org.kitteh.craftirc.endpoint.filter.FilterManager;
@@ -32,23 +40,12 @@ import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.exceptions.CraftIRCUnableToStartException;
 import org.kitteh.craftirc.exceptions.CraftIRCWillLeakTearsException;
 import org.kitteh.craftirc.irc.BotManager;
-import org.kitteh.craftirc.sponge.ChatEndpoint;
-import org.kitteh.craftirc.sponge.JoinEndpoint;
-import org.kitteh.craftirc.sponge.PermissionFilter;
-import org.kitteh.craftirc.sponge.QuitEndpoint;
+import org.kitteh.craftirc.minestom.ChatEndpoint;
+import org.kitteh.craftirc.minestom.JoinEndpoint;
+import org.kitteh.craftirc.minestom.PermissionFilter;
+import org.kitteh.craftirc.minestom.QuitEndpoint;
 import org.kitteh.craftirc.util.shutdownable.Shutdownable;
 import org.slf4j.Logger;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingEvent;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
@@ -64,80 +61,66 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+public final class CraftIRC extends Extension {
 
-@Plugin(id = "craftirc", name = "CraftIRC", version = "4.2.1-SNAPSHOT", authors = "mbaxter",
-        description = "Relay between IRC and Minecraft", url = "http://kitteh.org")
-public final class CraftIRC {
     private static Logger loggy;
     private static final String PERMISSION_RELOAD = "craftirc.reload";
 
-    @Inject
-    @ConfigDir(sharedRoot = false)
     private File configDir;
-    @Inject
-    private Game game;
-    @Inject
-    private Logger logger;
+
     private final Set<Endpoint> registeredEndpoints = new CopyOnWriteArraySet<>();
     private boolean reloading = false;
-    private String version = CraftIRC.class.getAnnotation(Plugin.class).version();
+    private String version = this.getDescription().getVersion();
 
-    @Listener
-    public void init(@Nonnull GameInitializationEvent event) {
-        this.startMeUp();
+    @Override
+    public void initialize() {
+        Command mainCommand = new Command("craftirc");
+        mainCommand.addSyntax((commandSource, args) -> {
+            if (!commandSource.hasPermission(new BasicPermission())) { // TODO Use the new permission system instead!
+                return;
+            }
+            String arg = args.getString("arg");
+            switch (arg) {
+            case "reload":
+                if (this.reloading) {
+                    commandSource.sendMessage(ColoredText.of(ChatColor.RED, "CraftIRC reload already in progress"));
+                } else {
+                    this.reloading = true;
+                    commandSource.sendMessage(ColoredText.of(ChatColor.CYAN, "CraftIRC reload scheduled!"));
+                    MinecraftServer.getSchedulerManager().buildTask(() -> {
+                        this.dontMakeAGrownManCry();
+                        this.startMeUp();
+                        this.reloading = false;
+                    }).delay(1, TimeUnit.TICK);
+                }
+            default:
+                
+            }
+        }, new ArgumentString("arg"));
+        mainCommand.setDefaultExecutor((commandSource, args) -> {
+            commandSource.sendMessage(ChatColor.CYAN + "CraftIRC version " + ChatColor.RESET + this.version + ChatColor.CYAN +  " - Powered by Kittens\n"
+                    + ChatColor.DARK_CYAN + "Original by mbaxter, ported to minestom by geolykt.");
+        });
+        MinecraftServer.getCommandManager().register(mainCommand);
     }
 
-    @Listener
-    public void starting(@Nonnull GameStartingServerEvent event) {
-        CommandSpec reloadSpec = CommandSpec.builder()
-                .executor((commandSource, commandContext) -> {
-                    if (this.reloading) {
-                        commandSource.sendMessage(Text.of(TextColors.RED, "CraftIRC reload already in progress"));
-                    } else {
-                        this.reloading = true;
-                        commandSource.sendMessage(Text.of(TextColors.AQUA, "CraftIRC reload scheduled"));
-                        this.game.getScheduler().createTaskBuilder()
-                                .async()
-                                .execute(() -> {
-                                    this.dontMakeAGrownManCry();
-                                    this.startMeUp();
-                                    this.reloading = false;
-                                })
-                                .name("CraftIRC Reloading...")
-                                .submit(this);
-                    }
-                    return CommandResult.success();
-                })
-                .permission(PERMISSION_RELOAD)
-                .build();
-        CommandSpec mainSpec = CommandSpec.builder()
-                .child(reloadSpec, "reload")
-                .executor((commandSource, commandContext) -> {
-                    commandSource.sendMessage(Text.of(TextColors.AQUA, "CraftIRC version ", TextColors.WHITE, this.version, TextColors.AQUA, " - Powered by Kittens"));
-                    return CommandResult.success();
-                })
-                .build();
-        this.game.getCommandManager().register(this, mainSpec, "craftirc");
-    }
-
-    @Listener
-    public void stahp(@Nonnull GameStoppingEvent event) {
+    @Override
+    public void terminate() {
         this.dontMakeAGrownManCry();
-    }
-
-    @Nonnull
-    public Game getGame() {
-        return this.game;
     }
 
     public void registerEndpoint(Endpoint endpoint) {
         this.registeredEndpoints.add(endpoint);
-        this.game.getEventManager().registerListeners(this, endpoint);
+        endpoint.registerListener();
     }
 
     private synchronized void startMeUp() {
         try {
-            CraftIRC.loggy = logger;
+            CraftIRC.loggy = getLogger();
+            if (configDir == null) {
+                configDir = new File(MinecraftServer.getExtensionManager().getExtensionFolder(), "craftIRC");
+                configDir.mkdirs();
+            }
 
             File configFile = new File(this.configDir, "config.yml");
             if (!configFile.exists()) {
@@ -177,7 +160,7 @@ public final class CraftIRC {
             this.endpointManager = new EndpointManager(this, endpoints);
             this.linkManager = new LinkManager(this, links);
         } catch (Exception e) {
-            this.logger.error("Uh oh", new CraftIRCUnableToStartException("Could not start CraftIRC!", e));
+            this.getLogger().error("Uh oh", new CraftIRCUnableToStartException("Could not start CraftIRC!", e));
             this.dontMakeAGrownManCry();
             return;
         }
@@ -190,7 +173,7 @@ public final class CraftIRC {
     }
 
     private synchronized void dontMakeAGrownManCry() {
-        this.registeredEndpoints.forEach(endpoint -> this.game.getEventManager().unregisterListeners(endpoint));
+        registeredEndpoints.forEach(endpoint -> endpoint.unregisterListeners());
         this.registeredEndpoints.clear();
         this.shutdownables.forEach(Shutdownable::shutdown);
         // And lastly...

@@ -21,7 +21,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.kitteh.craftirc.sponge;
+package org.kitteh.craftirc.minestom;
 
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
@@ -29,12 +29,14 @@ import org.kitteh.craftirc.endpoint.Message;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.util.MinecraftPlayer;
 import org.kitteh.craftirc.util.loadable.Loadable;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventCallback;
+import net.minestom.server.event.player.PlayerLoginEvent;
 
 import javax.annotation.Nonnull;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -53,15 +55,36 @@ public class JoinEndpoint extends MinecraftEndpoint {
         // NOOP
     }
 
-    @Listener
-    public void onChat(@Nonnull ClientConnectionEvent.Join event, @First Player player) {
-        if (!event.getChannel().isPresent()) {
-            return;
-        }
+    public void onChat(@Nonnull PlayerLoginEvent event) {
         Map<String, Object> data = new HashMap<>();
-        Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getChannel().get().getMembers());
-        data.put(JoinEndpoint.SENDER_NAME, player.getName());
+        Set<MinecraftPlayer> recipients = collectionToMinecraftPlayer(event.getSpawningInstance().getPlayers());
+        String player = event.getPlayer().getUsername();
+        data.put(JoinEndpoint.SENDER_NAME, event.getPlayer().getUsername());
         data.put(JoinEndpoint.RECIPIENT_NAMES, recipients);
-        this.getPlugin().getEndpointManager().sendMessage(new Message(this, event.getTargetEntity().getName() + " joined the game", data));
+        this.getPlugin().getEndpointManager().sendMessage(new Message(this, player + " joined the game", data));
+    }
+
+    private EventCallback<PlayerLoginEvent> callback;
+
+    @Override
+    public void registerListener() {
+        if (callback == null) {
+            callback = (evt) -> {
+                this.onChat(evt);
+            };
+        }
+        MinecraftServer.getConnectionManager().addPlayerInitialization(player -> {
+            if (callback != null) {
+                player.addEventCallback(PlayerLoginEvent.class, callback);
+            }
+        });
+    }
+
+    @Override
+    public void unregisterListeners() {
+        for (Player p : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
+            p.removeEventCallback(PlayerLoginEvent.class, callback);
+        }
+        callback = null;
     }
 }
