@@ -1,5 +1,5 @@
 {
-  "entrypoint": " org.kitteh.craftirc.CraftIRC",
+  "entrypoint": "org.kitteh.craftirc.CraftIRC",
   "name": "CraftIRC",
   "version": "4.2.1-SNAPSHOT",
   "authors": ["mbaxter", "geolykt"],

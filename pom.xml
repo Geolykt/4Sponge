@@ -100,33 +100,9 @@
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
             <version>4.0.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>minestomrelease</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <build>
         <defaultGoal>clean install</defaultGoal>
@@ -136,6 +112,7 @@
                 <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>config.yml</include>
+                    <include>extension.json</include>
                 </includes>
             </resource>
             <resource>
@@ -178,6 +155,17 @@
                                     <shadedPattern>org.kitteh.craftirc.lib.net.engio</shadedPattern>
                                 </relocation>
                             </relocations>
+                            <!-- The following files are here to prevent the class(es) from not being openable -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>

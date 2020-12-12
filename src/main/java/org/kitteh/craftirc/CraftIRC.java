@@ -69,13 +69,18 @@ public final class CraftIRC extends Extension {
 
     private final Set<Endpoint> registeredEndpoints = new CopyOnWriteArraySet<>();
     private boolean reloading = false;
-    private String version = this.getDescription().getVersion();
+    private String version = null;
+
+    @Override
+    public void preInitialize() {
+        version = this.getDescription().getVersion();
+    }
 
     @Override
     public void initialize() {
         Command mainCommand = new Command("craftirc");
         mainCommand.addSyntax((commandSource, args) -> {
-            if (!commandSource.hasPermission(PERMISSION_RELOAD)) { // TODO Use the new permission system instead!
+            if (!commandSource.hasPermission(PERMISSION_RELOAD)) {
                 return;
             }
             String arg = args.getString("arg");
@@ -101,6 +106,11 @@ public final class CraftIRC extends Extension {
                     + ChatColor.DARK_CYAN + "Original by mbaxter, ported to minestom by geolykt.");
         });
         MinecraftServer.getCommandManager().register(mainCommand);
+    }
+
+    @Override
+    public void postInitialize() {
+        this.startMeUp();
     }
 
     @Override
