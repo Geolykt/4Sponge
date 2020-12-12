@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.irc;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.Message;
@@ -36,7 +37,6 @@ import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.util.CIKeyMap;
 import net.engio.mbassy.listener.Handler;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -53,7 +53,7 @@ public final class IRCBot {
     private final Map<String, Set<IRCEndpoint>> channels;
     private final CraftIRC plugin;
 
-    IRCBot(@Nonnull CraftIRC plugin, @Nonnull String name, @Nonnull Client client) {
+    IRCBot(@NotNull CraftIRC plugin, @NotNull String name, @NotNull Client client) {
         this.plugin = plugin;
         this.client = client;
         this.channels = new CIKeyMap<>(client);
@@ -66,7 +66,7 @@ public final class IRCBot {
      *
      * @return bot name
      */
-    @Nonnull
+    @NotNull
     public String getName() {
         return this.name;
     }
@@ -77,7 +77,7 @@ public final class IRCBot {
      * @param endpoint endpoint this channel is assigned to
      * @param channel channel to join
      */
-    public void addChannel(@Nonnull IRCEndpoint endpoint, @Nonnull String channel) {
+    public void addChannel(@NotNull IRCEndpoint endpoint, @NotNull String channel) {
         this.client.addChannel(channel);
         Set<IRCEndpoint> points = this.channels.computeIfAbsent(channel, k -> new CopyOnWriteArraySet<>());
         points.add(endpoint);
@@ -89,7 +89,7 @@ public final class IRCBot {
      * @param target target channel
      * @param message message to send
      */
-    public void sendMessage(@Nonnull Channel target, @Nonnull String message) {
+    public void sendMessage(@NotNull Channel target, @NotNull String message) {
         this.client.sendMessage(target.getName(), message);
     }
 
@@ -99,15 +99,15 @@ public final class IRCBot {
      * @param target target
      * @param message message to send
      */
-    public void sendMessage(@Nonnull String target, @Nonnull String message) {
+    public void sendMessage(@NotNull String target, @NotNull String message) {
         this.client.sendMessage(target, message);
     }
 
     void shutdown() {
-        this.client.shutdown("CraftIRC!");
+        this.client.shutdown("CraftIRC!"); // TODO yeah
     }
 
-    private void sendMessage(@Nonnull User sender, @Nonnull Channel channel, @Nonnull String message, @Nonnull IRCEndpoint.MessageType messageType) {
+    private void sendMessage(@NotNull User sender, @NotNull Channel channel, @NotNull String message, @NotNull IRCEndpoint.MessageType messageType) {
         final String channelName = channel.getName();
         if (!this.channels.containsKey(channelName)) {
             return;
@@ -137,13 +137,13 @@ public final class IRCBot {
 
     private class Listener {
         @Handler
-        public void message(@Nonnull ChannelMessageEvent event) {
+        public void message(@NotNull ChannelMessageEvent event) {
             User user = event.getActor();
             IRCBot.this.sendMessage(user, event.getChannel(), event.getMessage(), IRCEndpoint.MessageType.MESSAGE);
         }
 
         @Handler
-        public void action(@Nonnull ChannelCtcpEvent event) {
+        public void action(@NotNull ChannelCtcpEvent event) {
             if (event.getMessage().startsWith("ACTION ")) {
                 IRCBot.this.sendMessage(event.getActor(), event.getChannel(), event.getMessage().substring("ACTION ".length()), IRCEndpoint.MessageType.ME);
             }

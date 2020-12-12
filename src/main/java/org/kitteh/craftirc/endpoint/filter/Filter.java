@@ -23,15 +23,14 @@
  */
 package org.kitteh.craftirc.endpoint.filter;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.link.Link;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.configurate.ConfigurationNode;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * This is a filter.
@@ -45,7 +44,7 @@ public abstract class Filter extends Loadable {
      *
      * @return the Link in use
      */
-    @Nonnull
+    @NotNull
     protected Link getLink() {
         return this.link;
     }
@@ -61,10 +60,10 @@ public abstract class Filter extends Loadable {
      *
      * @param message message to process
      */
-    public abstract void processMessage(@Nonnull TargetedMessage message);
+    public abstract void processMessage(@NotNull TargetedMessage message);
 
     @Override
-    protected final void load(@Nonnull CraftIRC plugin, @Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
+    protected final void load(@NotNull CraftIRC plugin, @NotNull ConfigurationNode data) throws CraftIRCInvalidConfigException {
         if (!data.node(FilterManager.Target.EndpointLoader).virtual()) {
             this.loader = (Link.LinkFilterLoader) data.node(FilterManager.Target.EndpointLoader).raw(); // FIXME Check for CCE
             this.link = this.loader.getLink();
@@ -78,7 +77,7 @@ public abstract class Filter extends Loadable {
      * @param data information to load
      * @throws CraftIRCInvalidConfigException if things go poorly
      */
-    protected void load(@Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
+    protected void load(@NotNull ConfigurationNode data) throws CraftIRCInvalidConfigException {
 
     }
 }

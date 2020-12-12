@@ -32,6 +32,7 @@ import net.minestom.server.extensions.Extension;
 import net.minestom.server.permission.BasicPermission;
 import net.minestom.server.utils.time.TimeUnit;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.EndpointManager;
 import org.kitteh.craftirc.endpoint.filter.FilterManager;
@@ -49,7 +50,6 @@ import org.slf4j.Logger;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -180,7 +180,7 @@ public final class CraftIRC extends Extension {
         CraftIRC.loggy = null;
     }
 
-    @Nonnull
+    @NotNull
     public static Logger log() {
         if (CraftIRC.loggy == null) {
             throw new CraftIRCWillLeakTearsException();
@@ -194,22 +194,22 @@ public final class CraftIRC extends Extension {
     private LinkManager linkManager;
     private final Set<Shutdownable> shutdownables = new CopyOnWriteArraySet<>();
 
-    @Nonnull
+    @NotNull
     public BotManager getBotManager() {
         return this.botManager;
     }
 
-    @Nonnull
+    @NotNull
     public EndpointManager getEndpointManager() {
         return this.endpointManager;
     }
 
-    @Nonnull
+    @NotNull
     public FilterManager getFilterManager() {
         return this.filterManager;
     }
 
-    @Nonnull
+    @NotNull
     public LinkManager getLinkManager() {
         return this.linkManager;
     }
@@ -219,11 +219,11 @@ public final class CraftIRC extends Extension {
      *
      * @param shutdownable feature to track
      */
-    public void trackShutdownable(@Nonnull Shutdownable shutdownable) {
+    public void trackShutdownable(@NotNull Shutdownable shutdownable) {
         this.shutdownables.add(shutdownable);
     }
 
-    private void saveDefaultConfig(@Nonnull File dataFolder) {
+    private void saveDefaultConfig(@NotNull File dataFolder) {
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }

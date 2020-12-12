@@ -23,13 +23,12 @@
  */
 package org.kitteh.craftirc.endpoint;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.link.Link;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.configurate.ConfigurationNode;
-
-import javax.annotation.Nonnull;
 
 /**
  * Endpoints are the origin and destination of messages tracked by CraftIRC.
@@ -57,7 +56,7 @@ public abstract class Endpoint extends Loadable {
      *
      * @return the name of this endpoint
      */
-    @Nonnull
+    @NotNull
     public final String getName() {
         return this.name;
     }
@@ -72,12 +71,12 @@ public abstract class Endpoint extends Loadable {
      *
      * @param data the 'extra' section of the configuration
      */
-    protected void loadExtra(@Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
+    protected void loadExtra(@NotNull ConfigurationNode data) throws CraftIRCInvalidConfigException {
         // By default, nothing extra to load
     }
 
     @Override
-    protected final void load(@Nonnull CraftIRC plugin, @Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
+    protected final void load(@NotNull CraftIRC plugin, @NotNull ConfigurationNode data) throws CraftIRCInvalidConfigException {
         this.name = data.node("name").getString();
         final ConfigurationNode extra = data.node("extra");
         if (!extra.virtual()) {
@@ -90,7 +89,7 @@ public abstract class Endpoint extends Loadable {
      *
      * @param message message to process
      */
-    protected void preProcessReceivedMessage(@Nonnull TargetedMessage message) {
+    protected void preProcessReceivedMessage(@NotNull TargetedMessage message) {
         // By default, don't do anything
     }
 
@@ -102,7 +101,7 @@ public abstract class Endpoint extends Loadable {
      *
      * @param message the message to be displayed
      */
-    protected abstract void receiveMessage(@Nonnull TargetedMessage message);
+    protected abstract void receiveMessage(@NotNull TargetedMessage message);
 
     /**
      * Receive a message and process.
@@ -117,7 +116,7 @@ public abstract class Endpoint extends Loadable {
      * @param message the message sent by the source
      * @param link the link over which this message is sent
      */
-    final void receiveMessage(@Nonnull Message message, @Nonnull Link link) {
+    final void receiveMessage(@NotNull Message message, @NotNull Link link) {
         TargetedMessage targetedMessage = new TargetedMessage(this, message);
         try {
             this.preProcessReceivedMessage(targetedMessage);

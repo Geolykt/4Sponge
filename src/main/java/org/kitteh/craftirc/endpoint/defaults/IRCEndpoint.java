@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.endpoint.defaults;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
@@ -30,8 +31,6 @@ import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.irc.IRCBot;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.configurate.ConfigurationNode;
-
-import javax.annotation.Nonnull;
 
 /**
  * The standard {@link Endpoint} for IRC bots.
@@ -48,7 +47,7 @@ public class IRCEndpoint extends Endpoint {
             this.format = format;
         }
 
-        @Nonnull
+        @NotNull
         public String getFormat() {
             return this.format;
         }
@@ -70,12 +69,12 @@ public class IRCEndpoint extends Endpoint {
     }
 
     @Override
-    protected void receiveMessage(@Nonnull TargetedMessage message) {
+    protected void receiveMessage(@NotNull TargetedMessage message) {
         this.bot.sendMessage(this.channel, message.getCustomMessage());
     }
 
     @Override
-    protected void loadExtra(@Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
+    protected void loadExtra(@NotNull ConfigurationNode data) throws CraftIRCInvalidConfigException {
         final String botName = data.node("bot").getString();
         if (botName == null) {
             throw new CraftIRCInvalidConfigException("No bot defined");

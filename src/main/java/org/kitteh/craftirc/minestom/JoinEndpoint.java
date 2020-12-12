@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.minestom;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.Message;
@@ -35,8 +36,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventCallback;
 import net.minestom.server.event.player.PlayerLoginEvent;
 
-import javax.annotation.Nonnull;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -46,16 +45,16 @@ import java.util.Set;
  */
 @Loadable.Type(name = "mc-join")
 public class JoinEndpoint extends MinecraftEndpoint {
-    public JoinEndpoint(@Nonnull CraftIRC plugin) {
+    public JoinEndpoint(@NotNull CraftIRC plugin) {
         super(plugin);
     }
 
     @Override
-    protected void receiveMessage(@Nonnull TargetedMessage message) {
+    protected void receiveMessage(@NotNull TargetedMessage message) {
         // NOOP
     }
 
-    public void onChat(@Nonnull PlayerLoginEvent event) {
+    public void onChat(@NotNull PlayerLoginEvent event) {
         Map<String, Object> data = new HashMap<>();
         Set<MinecraftPlayer> recipients = collectionToMinecraftPlayer(event.getSpawningInstance().getPlayers());
         String player = event.getPlayer().getUsername();

@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.minestom;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.filter.Filter;
@@ -34,7 +35,6 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.permission.BasicPermission;
 
-import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -47,20 +47,20 @@ public final class PermissionFilter extends Filter {
     @Load
     private String permission;
 
-    public PermissionFilter(@Nonnull CraftIRC plugin) {}
+    public PermissionFilter(@NotNull CraftIRC plugin) {}
 
     /**
      * Gets the permission node being monitored.
      *
      * @return the permission node monitored
      */
-    @Nonnull
+    @NotNull
     public BasicPermission getPermission() {
         return new BasicPermission(); // TODO use string based permissions!
     }
 
     @Override
-    public void processMessage(@Nonnull TargetedMessage message) {
+    public void processMessage(@NotNull TargetedMessage message) {
         if (message.getCustomData().containsKey(ChatEndpoint.RECIPIENT_NAMES)) {
             @SuppressWarnings("unchecked")
             List<MinecraftPlayer> players = (List<MinecraftPlayer>) message.getCustomData().get(ChatEndpoint.RECIPIENT_NAMES);

@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.endpoint.filter.defaults;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.filter.Filter;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
@@ -30,7 +31,6 @@ import org.kitteh.craftirc.util.loadable.Load;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.configurate.ConfigurationNode;
 
-import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -47,13 +47,13 @@ public class DataMapper extends Filter {
     private String message;
     private List<String> variables;
 
-    @Nonnull
+    @NotNull
     public String getMessageFormat() {
         return this.message;
     }
 
     @Override
-    public void processMessage(@Nonnull TargetedMessage message) {
+    public void processMessage(@NotNull TargetedMessage message) {
         Object[] vars = new Object[this.variables.size()];
         for (int i = 0; i < vars.length; i++) {
             Object data = message.getCustomData().get(this.variables.get(i));
@@ -63,7 +63,7 @@ public class DataMapper extends Filter {
     }
 
     @Override
-    protected void load(@Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
+    protected void load(@NotNull ConfigurationNode data) throws CraftIRCInvalidConfigException {
         Matcher matcher = PERCENT_VARIABLE.matcher(this.message);
         this.variables = new LinkedList<>();
         StringBuilder builder = new StringBuilder();

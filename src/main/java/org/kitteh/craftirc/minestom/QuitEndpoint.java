@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.minestom;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.Message;
@@ -35,7 +36,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventCallback;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -45,16 +45,16 @@ import java.util.Set;
  */
 @Loadable.Type(name = "mc-quit")
 public class QuitEndpoint extends MinecraftEndpoint {
-    public QuitEndpoint(@Nonnull CraftIRC plugin) {
+    public QuitEndpoint(@NotNull CraftIRC plugin) {
         super(plugin);
     }
 
     @Override
-    protected void receiveMessage(@Nonnull TargetedMessage message) {
+    protected void receiveMessage(@NotNull TargetedMessage message) {
         // NOOP
     }
 
-    public void onChat(@Nonnull PlayerDisconnectEvent event) {
+    public void onChat(@NotNull PlayerDisconnectEvent event) {
         Map<String, Object> data = new HashMap<>();
         Set<MinecraftPlayer> recipients = this.collectionToMinecraftPlayer(event.getPlayer().getInstance().getPlayers());
         data.put(QuitEndpoint.SENDER_NAME, event.getPlayer().getUsername());

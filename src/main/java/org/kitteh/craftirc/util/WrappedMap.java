@@ -23,8 +23,9 @@
  */
 package org.kitteh.craftirc.util;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class WrappedMap<Key, Value> {
      *
      * @param map map to be wrapped and untouched
      */
-    public WrappedMap(@Nonnull Map<Key, Value> map) {
+    public WrappedMap(@NotNull Map<Key, Value> map) {
         this.innerMap = map;
     }
 
@@ -147,7 +148,7 @@ public class WrappedMap<Key, Value> {
      *
      * @param m mappings to add to the modifiable map
      */
-    public void putAll(@Nonnull Map<? extends Key, ? extends Value> m) {
+    public void putAll(@NotNull Map<? extends Key, ? extends Value> m) {
         this.outerMap.putAll(m);
     }
 }

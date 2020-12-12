@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.minestom;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
@@ -32,7 +33,6 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.entity.Player;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,29 +46,29 @@ public abstract class MinecraftEndpoint extends Endpoint {
 
     private final CraftIRC plugin;
 
-    public MinecraftEndpoint(@Nonnull CraftIRC plugin) {
+    public MinecraftEndpoint(@NotNull CraftIRC plugin) {
         this.plugin = plugin;
         this.plugin.registerEndpoint(this);
     }
 
-    @Nonnull
+    @NotNull
     protected CraftIRC getPlugin() {
         return this.plugin;
     }
 
     @Override
-    protected void preProcessReceivedMessage(@Nonnull TargetedMessage message) {
+    protected void preProcessReceivedMessage(@NotNull TargetedMessage message) {
         Set<MinecraftPlayer> players = this.collectionToMinecraftPlayer(MinecraftServer.getConnectionManager().getOnlinePlayers());
         message.getCustomData().put(MinecraftEndpoint.RECIPIENT_NAMES, players);
     }
 
-    @Nonnull
-    protected Set<MinecraftPlayer> collectionToMinecraftPlayer(@Nonnull Collection<Player> collection) {
+    @NotNull
+    protected Set<MinecraftPlayer> collectionToMinecraftPlayer(@NotNull Collection<Player> collection) {
         return collection.stream().map(player -> new MinecraftPlayer(((Player) player).getUsername(), ((Player) player).getUuid())).collect(Collectors.toCollection(HashSet::new));
     }
 
-    @Nonnull
-    protected Set<MinecraftPlayer> commandSourceIterableToMinecraftPlayer(@Nonnull Iterable<? extends CommandSender> iterable) {
+    @NotNull
+    protected Set<MinecraftPlayer> commandSourceIterableToMinecraftPlayer(@NotNull Iterable<? extends CommandSender> iterable) {
         Set<MinecraftPlayer> set = new HashSet<>();
         iterable.forEach(source -> {
             if (source instanceof Player) {

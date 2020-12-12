@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.endpoint.filter;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.filter.defaults.AntiHighlight;
 import org.kitteh.craftirc.endpoint.filter.defaults.Colors;
@@ -33,7 +34,6 @@ import org.kitteh.craftirc.util.loadable.LoadableTypeManager;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +49,7 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
 
     private final Map<String, ConfigurationNode> repeatableObjects = new ConcurrentHashMap<>();
 
-    public FilterManager(@Nonnull CraftIRC plugin, @Nonnull ConfigurationNode repeatables) {
+    public FilterManager(@NotNull CraftIRC plugin, @NotNull ConfigurationNode repeatables) {
         super(plugin, Filter.class);
         // Register filter types here
         this.registerType(AntiHighlight.class);
@@ -62,11 +62,11 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
     }
 
     @Override
-    protected void loadList(@Nonnull List<? extends ConfigurationNode> list) {
+    protected void loadList(@NotNull List<? extends ConfigurationNode> list) {
         throw new UnsupportedOperationException("Must provide Endpoint when loading filters!");
     }
 
-    public void loadList(@Nonnull List<? extends ConfigurationNode> list, @Nonnull Link.LinkFilterLoader link) {
+    public void loadList(@NotNull List<? extends ConfigurationNode> list, @NotNull Link.LinkFilterLoader link) {
         List<ConfigurationNode> updatedList = new ArrayList<>(list);
         for (int i = 0; i < updatedList.size(); i++) {
             ConfigurationNode node = updatedList.get(i);
@@ -87,7 +87,7 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
         super.loadList(updatedList);
     }
 
-    private void loadRepeatables(@Nonnull ConfigurationNode repeatables) {
+    private void loadRepeatables(@NotNull ConfigurationNode repeatables) {
         for (Map.Entry<Object, ? extends ConfigurationNode> entry : repeatables.childrenMap().entrySet()) {
             if (!(entry.getKey() instanceof String)) {
                 // TODO log
@@ -98,7 +98,7 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
     }
 
     @Override
-    protected void processCompleted(@Nonnull Filter loaded) {
+    protected void processCompleted(@NotNull Filter loaded) {
         Link.LinkFilterLoader loader = loaded.getLoader();
         if (loader != null) {
             loader.addFilter(loaded);
@@ -106,12 +106,12 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
     }
 
     @Override
-    protected void processFailedLoad(@Nonnull Exception exception, @Nonnull ConfigurationNode data) {
+    protected void processFailedLoad(@NotNull Exception exception, @NotNull ConfigurationNode data) {
         CraftIRC.log().warn("Failed to load Filter", exception);
     }
 
     @Override
-    protected void processInvalid(@Nonnull String reason, @Nonnull ConfigurationNode data) {
+    protected void processInvalid(@NotNull String reason, @NotNull ConfigurationNode data) {
         CraftIRC.log().warn("Encountered invalid Filter: " + reason);
     }
 }

@@ -23,18 +23,19 @@
  */
 package org.kitteh.craftirc.exceptions;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 
 /**
  * Invalid configs trigger these
  */
 public class CraftIRCInvalidConfigException extends Exception {
-    public CraftIRCInvalidConfigException(@Nonnull String message) {
+    public CraftIRCInvalidConfigException(@NotNull String message) {
         super(message);
     }
 
-    public CraftIRCInvalidConfigException(@Nonnull IOException e) {
+    public CraftIRCInvalidConfigException(@NotNull IOException e) {
         super("Could not load config file. See related exception", e);
     }
 }

@@ -23,10 +23,10 @@
  */
 package org.kitteh.craftirc.endpoint.link;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.spongepowered.configurate.ConfigurationNode;
 
-import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +44,7 @@ public final class LinkManager {
      * @param plugin the CraftIRC instance
      * @param links a list of link data to load
      */
-    public LinkManager(@Nonnull CraftIRC plugin, @Nonnull List<? extends ConfigurationNode> links) {
+    public LinkManager(@NotNull CraftIRC plugin, @NotNull List<? extends ConfigurationNode> links) {
         int nonMap = 0;
         int noSource = 0;
         int noTarget = 0;
@@ -80,8 +80,8 @@ public final class LinkManager {
         }
     }
 
-    @Nonnull
-    public List<Link> getLinks(@Nonnull String source) {
+    @NotNull
+    public List<Link> getLinks(@NotNull String source) {
         LinkedList<Link> linkList = new LinkedList<>();
         List<Link> links = this.links.get(source);
         if (links != null) {
@@ -90,7 +90,7 @@ public final class LinkManager {
         return linkList;
     }
 
-    private void addLink(@Nonnull Link link) {
+    private void addLink(@NotNull Link link) {
         List<Link> links = this.links.computeIfAbsent(link.getSource(), k -> new LinkedList<>());
         links.add(link);
     }

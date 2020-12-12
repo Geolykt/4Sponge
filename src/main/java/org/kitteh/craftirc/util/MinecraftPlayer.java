@@ -23,15 +23,15 @@
  */
 package org.kitteh.craftirc.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.util.Sanity;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
  * Represents an ingame player
  */
+// TODO remove
 public final class MinecraftPlayer {
     private final String name;
     private final UUID uniqueId;
@@ -42,7 +42,8 @@ public final class MinecraftPlayer {
      * @param name current name of the player
      * @param uniqueId the player's UUID
      */
-    public MinecraftPlayer(@Nonnull String name, @Nonnull UUID uniqueId) {
+    public MinecraftPlayer(@NotNull String name, @NotNull UUID uniqueId) {
+        // FIXME unnessary operations
         this.name = Sanity.nullCheck(name, "Name cannot be null");
         this.uniqueId = Sanity.nullCheck(uniqueId, "uniqueId cannot be null");
     }
@@ -52,7 +53,7 @@ public final class MinecraftPlayer {
      *
      * @return the player's name
      */
-    @Nonnull
+    @NotNull
     public String getName() {
         return this.name;
     }
@@ -62,13 +63,13 @@ public final class MinecraftPlayer {
      *
      * @return the player's UUID
      */
-    @Nonnull
+    @NotNull
     public UUID getUniqueID() {
         return this.uniqueId;
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(@NotNull Object o) {
         if (o instanceof MinecraftPlayer) {
             MinecraftPlayer p = (MinecraftPlayer) o;
             return this.name.equals(p.name) && this.uniqueId.equals(p.uniqueId);

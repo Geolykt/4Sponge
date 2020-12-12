@@ -23,7 +23,8 @@
  */
 package org.kitteh.craftirc.endpoint;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,7 @@ public final class Message {
      * @param defaultMessage this default message
      * @param data all associated data
      */
-    public Message(@Nonnull Endpoint source, @Nonnull String defaultMessage, @Nonnull Map<String, Object> data) {
+    public Message(@NotNull Endpoint source, @NotNull String defaultMessage, @NotNull Map<String, Object> data) {
         this.source = source;
         this.defaultMessage = defaultMessage;
         this.data = Collections.unmodifiableMap(new HashMap<>(data));
@@ -56,7 +57,7 @@ public final class Message {
      *
      * @return an immutable map representing the data
      */
-    @Nonnull
+    @NotNull
     public Map<String, Object> getData() {
         return this.data;
     }
@@ -66,7 +67,7 @@ public final class Message {
      *
      * @return the default message
      */
-    @Nonnull
+    @NotNull
     public String getDefaultMessage() {
         return this.defaultMessage;
     }
@@ -76,7 +77,7 @@ public final class Message {
      *
      * @return the source Endpoint
      */
-    @Nonnull
+    @NotNull
     public Endpoint getSource() {
         return this.source;
     }

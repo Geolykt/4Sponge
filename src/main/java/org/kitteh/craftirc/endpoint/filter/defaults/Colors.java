@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.endpoint.filter.defaults;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.defaults.IRCEndpoint;
@@ -31,7 +32,6 @@ import org.kitteh.craftirc.util.WrappedMap;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.kitteh.irc.client.library.util.Format;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -94,7 +94,7 @@ public class Colors extends Filter {
     }
 
     @Override
-    public void processMessage(@Nonnull TargetedMessage message) {
+    public void processMessage(@NotNull TargetedMessage message) {
         Endpoint origin = message.getTarget();
         message.setCustomMessage(this.process(origin, message.getCustomMessage()));
         WrappedMap<String, Object> map = message.getCustomData();

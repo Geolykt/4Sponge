@@ -23,11 +23,11 @@
  */
 package org.kitteh.craftirc.util.loadable;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.spongepowered.configurate.ConfigurationNode;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -54,5 +54,5 @@ public abstract class Loadable {
      * @param data data to load
      * @throws CraftIRCInvalidConfigException if invalid
      */
-    protected abstract void load(@Nonnull CraftIRC plugin, @Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException;
+    protected abstract void load(@NotNull CraftIRC plugin, @NotNull ConfigurationNode data) throws CraftIRCInvalidConfigException;
 }

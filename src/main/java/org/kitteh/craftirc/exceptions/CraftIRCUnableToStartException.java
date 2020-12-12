@@ -23,13 +23,13 @@
  */
 package org.kitteh.craftirc.exceptions;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Thrown if CraftIRC fails to start.
  */
 public class CraftIRCUnableToStartException extends Exception {
-    public CraftIRCUnableToStartException(@Nonnull String message, @Nonnull Exception reason) {
+    public CraftIRCUnableToStartException(@NotNull String message, @NotNull Exception reason) {
         super(message, reason);
     }
 }

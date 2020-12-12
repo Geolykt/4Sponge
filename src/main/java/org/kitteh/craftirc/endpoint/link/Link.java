@@ -23,13 +23,13 @@
  */
 package org.kitteh.craftirc.endpoint.link;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.filter.Filter;
 import org.spongepowered.configurate.ConfigurationNode;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -44,12 +44,12 @@ public class Link {
         private LinkFilterLoader() {
         }
 
-        @Nonnull
+        @NotNull
         public Link getLink() {
             return Link.this;
         }
 
-        public void addFilter(@Nonnull Filter filter) {
+        public void addFilter(@NotNull Filter filter) {
             Link.this.addFilter(filter);
         }
     }
@@ -58,7 +58,7 @@ public class Link {
     private final String target;
     private final List<Filter> filters = new CopyOnWriteArrayList<>();
 
-    public Link(@Nonnull CraftIRC plugin, @Nonnull String source, @Nonnull String target, @Nullable List<? extends ConfigurationNode> filters) {
+    public Link(@NotNull CraftIRC plugin, @NotNull String source, @NotNull String target, @Nullable List<? extends ConfigurationNode> filters) {
         this.source = source;
         this.target = target;
         if (filters != null) {
@@ -71,7 +71,7 @@ public class Link {
      *
      * @return the source endpoint name
      */
-    @Nonnull
+    @NotNull
     public String getSource() {
         return this.source;
     }
@@ -81,12 +81,12 @@ public class Link {
      *
      * @return the target endpoint name
      */
-    @Nonnull
+    @NotNull
     public String getTarget() {
         return this.target;
     }
 
-    private void addFilter(@Nonnull Filter filter) {
+    private void addFilter(@NotNull Filter filter) {
         this.filters.add(filter);
     }
 
@@ -95,7 +95,7 @@ public class Link {
      *
      * @param message the message sent by the source
      */
-    public void filterMessage(@Nonnull TargetedMessage message) {
+    public void filterMessage(@NotNull TargetedMessage message) {
         for (Filter filter : this.filters) {
             try {
                 filter.processMessage(message);

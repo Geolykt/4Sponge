@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.endpoint.filter.defaults;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.endpoint.TargetedMessage;
 import org.kitteh.craftirc.endpoint.filter.Filter;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
@@ -30,7 +31,6 @@ import org.kitteh.craftirc.util.loadable.Load;
 import org.kitteh.craftirc.util.loadable.Loadable;
 import org.spongepowered.configurate.ConfigurationNode;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,7 +103,7 @@ public class RegexFilter extends Filter {
     private final List<String> namedGroups = new LinkedList<>();
 
     @Override
-    protected void load(@Nonnull ConfigurationNode data) throws CraftIRCInvalidConfigException {
+    protected void load(@NotNull ConfigurationNode data) throws CraftIRCInvalidConfigException {
         final String pattern;
         if ((pattern = data.node("pattern").getString()) == null) {
             throw new CraftIRCInvalidConfigException("Regex pattern requires a 'pattern' defined");
@@ -138,7 +138,7 @@ public class RegexFilter extends Filter {
     }
 
     @Override
-    public void processMessage(@Nonnull TargetedMessage message) {
+    public void processMessage(@NotNull TargetedMessage message) {
         String val = message.getCustomData().get(this.value).toString();
         Matcher matcher = this.pattern.matcher(val);
         boolean matches;

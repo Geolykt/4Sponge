@@ -23,17 +23,16 @@
  */
 package org.kitteh.craftirc.irc;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.feature.auth.NickServ;
 
-import javax.annotation.Nonnull;
-
-class NicklessServ extends NickServ {
-    NicklessServ(@Nonnull Client client, @Nonnull String accountName, @Nonnull String password) {
+class NicklessServ extends NickServ { //TODO name?
+    NicklessServ(@NotNull Client client, @NotNull String accountName, @NotNull String password) {
         super(client, accountName, password);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected String getAuthentication() {
         return "PRIVMSG " + this.getNickServNick() + " :IDENTIFY " + this.getPassword();

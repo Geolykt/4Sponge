@@ -23,13 +23,13 @@
  */
 package org.kitteh.craftirc.irc;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.feature.auth.NickServ;
 import org.spongepowered.configurate.ConfigurationNode;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +49,7 @@ public final class BotManager {
      * @param plugin the CraftIRC instance
      * @param bots list of bot data to load
      */
-    public BotManager(@Nonnull CraftIRC plugin, @Nonnull List<? extends ConfigurationNode> bots) {
+    public BotManager(@NotNull CraftIRC plugin, @NotNull List<? extends ConfigurationNode> bots) {
         this.plugin = plugin;
         this.plugin.trackShutdownable(() -> BotManager.this.bots.values().forEach(IRCBot::shutdown));
         this.loadBots(bots);
@@ -62,11 +62,11 @@ public final class BotManager {
      * @return named bot or null if no such bot exists
      */
     @Nullable
-    public IRCBot getBot(@Nonnull String name) {
+    public IRCBot getBot(@NotNull String name) {
         return this.bots.get(name);
     }
 
-    private void loadBots(@Nonnull List<? extends ConfigurationNode> list) {
+    private void loadBots(@NotNull List<? extends ConfigurationNode> list) {
         Set<String> usedBotNames = new HashSet<>();
         int nonMap = 0;
         int noName = 0;
@@ -94,7 +94,7 @@ public final class BotManager {
         }
     }
 
-    private void addBot(@Nonnull String name, @Nonnull ConfigurationNode data) {
+    private void addBot(@NotNull String name, @NotNull ConfigurationNode data) {
         Client.Builder botBuilder = Client.builder();
         botBuilder.name(name);
         botBuilder.serverHost(data.node("host").getString("localhost"));

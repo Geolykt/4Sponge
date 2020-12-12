@@ -23,6 +23,7 @@
  */
 package org.kitteh.craftirc.minestom;
 
+import org.jetbrains.annotations.NotNull;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.endpoint.Endpoint;
 import org.kitteh.craftirc.endpoint.Message;
@@ -35,7 +36,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventCallback;
 import net.minestom.server.event.player.PlayerChatEvent;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -46,12 +46,12 @@ import java.util.Set;
  */
 @Loadable.Type(name = "mc-chat")
 public class ChatEndpoint extends MinecraftEndpoint {
-    public ChatEndpoint(@Nonnull CraftIRC plugin) {
+    public ChatEndpoint(@NotNull CraftIRC plugin) {
         super(plugin);
     }
 
     @Override
-    protected void receiveMessage(@Nonnull TargetedMessage message) {
+    protected void receiveMessage(@NotNull TargetedMessage message) {
         @SuppressWarnings("unchecked")
         Set<MinecraftPlayer> recipients = (Set<MinecraftPlayer>) message.getCustomData().get(ChatEndpoint.RECIPIENT_NAMES);
         for (MinecraftPlayer recipient : recipients) {
@@ -60,7 +60,7 @@ public class ChatEndpoint extends MinecraftEndpoint {
         }
     }
 
-    public void onChat(@Nonnull PlayerChatEvent event) {
+    public void onChat(@NotNull PlayerChatEvent event) {
         if (event.isCancelled()) {
             return;
         }
