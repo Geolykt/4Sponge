@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.irc.client.library.Client;
+import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
 import org.kitteh.irc.client.library.feature.auth.NickServ;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -97,12 +98,12 @@ public final class BotManager {
     private void addBot(@NotNull String name, @NotNull ConfigurationNode data) {
         Client.Builder botBuilder = Client.builder();
         botBuilder.name(name);
-        botBuilder.serverHost(data.node("host").getString("localhost"));
-        botBuilder.serverPort(data.node("port").getInt(6667));
-        botBuilder.secure(data.node("ssl").getBoolean());
+        botBuilder.server().host(data.node("host").getString("localhost"));
+        SecurityType security = data.node("ssl").getBoolean() ? SecurityType.SECURE : SecurityType.INSECURE;
+        botBuilder.server().port(data.node("port").getInt(6667), security);
         ConfigurationNode password = data.node("password");
         if (!password.virtual()) {
-            botBuilder.serverPassword(password.getString());
+            botBuilder.server().password(password.getString());
         }
         botBuilder.user(data.node("user").getString("CraftIRC"));
         botBuilder.realName(data.node("realname").getString("CraftIRC Bot"));
@@ -110,9 +111,9 @@ public final class BotManager {
         ConfigurationNode bind = data.node("bind");
         ConfigurationNode bindHost = bind.node("host");
         if (!bindHost.virtual()) {
-            botBuilder.bindHost(bindHost.getString());
+            botBuilder.bind().host(bindHost.getString());
         }
-        botBuilder.bindPort(bind.node("port").getInt(0));
+        botBuilder.bind().port(bind.node("port").getInt(0));
         botBuilder.nick(data.node("nick").getString("CraftIRC"));
 
         ConfigurationNode auth = data.node("auth");
@@ -122,21 +123,21 @@ public final class BotManager {
 
         ConfigurationNode debug = data.node("debug-output");
         if (debug.node("exceptions").getBoolean()) {
-            botBuilder.exceptionListener(exception -> CraftIRC.log().warn("Exception on bot " + name, exception));
+            botBuilder.listeners().exception(exception -> CraftIRC.log().warn("Exception on bot " + name, exception));
         } else {
-            botBuilder.exceptionListener(null);
+            botBuilder.listeners().exception(null);
         }
         if (debug.node("input").getBoolean()) {
-            botBuilder.inputListener(input -> CraftIRC.log().info("[IN] " + input));
+            botBuilder.listeners().input(input -> CraftIRC.log().info("[IN] " + input));
         }
         if (debug.node("output").getBoolean()) {
-            botBuilder.outputListener(output -> CraftIRC.log().info("[OUT] " + output));
+            botBuilder.listeners().output(output -> CraftIRC.log().info("[OUT] " + output));
         }
 
         Client newBot = botBuilder.build();
 
         if (authUser != null && authPass != null) {
-            newBot.getAuthManager().addProtocol(nickless ? new NicklessServ(newBot, authUser, authPass) : new NickServ(newBot, authUser, authPass));
+            newBot.getAuthManager().addProtocol(nickless ? new NicklessServ(newBot, authUser, authPass) : NickServ.builder(newBot).account(authUser).password(authPass).build());
         }
 
         newBot.connect();

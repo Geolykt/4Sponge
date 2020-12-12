@@ -29,12 +29,12 @@ import org.kitteh.irc.client.library.feature.auth.NickServ;
 
 class NicklessServ extends NickServ { //TODO name?
     NicklessServ(@NotNull Client client, @NotNull String accountName, @NotNull String password) {
-        super(client, accountName, password);
+        super(client, "NickServ", accountName, password);
     }
 
     @NotNull
     @Override
     protected String getAuthentication() {
-        return "PRIVMSG " + this.getNickServNick() + " :IDENTIFY " + this.getPassword();
+        return "PRIVMSG " + this.getAccountName()+ " :IDENTIFY " + this.getPassword();
     }
 }

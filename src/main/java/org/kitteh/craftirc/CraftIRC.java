@@ -29,7 +29,6 @@ import net.minestom.server.chat.ColoredText;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentString;
 import net.minestom.server.extensions.Extension;
-import net.minestom.server.permission.BasicPermission;
 import net.minestom.server.utils.time.TimeUnit;
 
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +75,7 @@ public final class CraftIRC extends Extension {
     public void initialize() {
         Command mainCommand = new Command("craftirc");
         mainCommand.addSyntax((commandSource, args) -> {
-            if (!commandSource.hasPermission(new BasicPermission())) { // TODO Use the new permission system instead!
+            if (!commandSource.hasPermission(PERMISSION_RELOAD)) { // TODO Use the new permission system instead!
                 return;
             }
             String arg = args.getString("arg");

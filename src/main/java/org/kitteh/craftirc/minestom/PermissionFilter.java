@@ -33,7 +33,6 @@ import org.kitteh.craftirc.util.loadable.Loadable;
 
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
-import net.minestom.server.permission.BasicPermission;
 
 import java.util.Iterator;
 import java.util.List;
@@ -55,8 +54,8 @@ public final class PermissionFilter extends Filter {
      * @return the permission node monitored
      */
     @NotNull
-    public BasicPermission getPermission() {
-        return new BasicPermission(); // TODO use string based permissions!
+    public String getPermission() {
+        return permission;
     }
 
     @Override
