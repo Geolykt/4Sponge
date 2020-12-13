@@ -65,11 +65,15 @@
             <artifactId>client-lib</artifactId>
             <version>7.3.0</version>
             <type>jar</type>
-            <scope>provided</scope>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.code.findbugs</groupId>
                     <artifactId>jsr305</artifactId>
+                </exclusion>
+                <exclusion> <!-- Minestom already provides io.netty for us -->
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-codec</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -146,16 +150,18 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
+                                <!-- SpongePowered bricks the Minestom ClassLoader -->
                                 <relocation>
-                                    <pattern>io.netty</pattern>
-                                    <shadedPattern>org.kitteh.craftirc.lib.io.netty</shadedPattern>
+                                    <pattern>org.spongepowered</pattern>
+                                    <shadedPattern>org.borkpowered</shadedPattern>
                                 </relocation>
+                                <!-- This also bricks Minestom -->
                                 <relocation>
                                     <pattern>net.engio</pattern>
                                     <shadedPattern>org.kitteh.craftirc.lib.net.engio</shadedPattern>
                                 </relocation>
                             </relocations>
-                            <!-- The following files are here to prevent the class(es) from not being openable -->
+                            <!-- And these brick Java -->
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
