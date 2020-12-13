@@ -1,5 +1,6 @@
 /*
  * * Copyright (C) 2014-2018 Matt Baxter http://kitteh.org
+ * * Copyright (C) 2020 Emeric Werner https://geolykt.de
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
