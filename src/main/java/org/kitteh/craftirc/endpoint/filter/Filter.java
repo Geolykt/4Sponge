@@ -64,10 +64,11 @@ public abstract class Filter extends Loadable {
 
     @Override
     protected final void load(@NotNull CraftIRC plugin, @NotNull ConfigurationNode data) throws CraftIRCInvalidConfigException {
-        if (!data.node(FilterManager.Target.EndpointLoader).virtual()) {
-            this.loader = (Link.LinkFilterLoader) data.node(FilterManager.Target.EndpointLoader).raw(); // FIXME Check for CCE
-            this.link = this.loader.getLink();
-        }
+        // FIXME reimplement this functionality
+//        if (!data.node(FilterManager.Target.EndpointLoader).virtual()) {
+//            this.loader = (Link.LinkFilterLoader) data.node(FilterManager.Target.EndpointLoader).raw(); // FIXME Check for CCE
+//            this.link = this.loader.getLink();
+//        }
         this.load(data);
     }
 

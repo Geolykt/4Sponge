@@ -32,7 +32,6 @@ import org.kitteh.craftirc.endpoint.filter.defaults.RegexFilter;
 import org.kitteh.craftirc.endpoint.link.Link;
 import org.kitteh.craftirc.util.loadable.LoadableTypeManager;
 import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Handles Filters.
  */
 public final class FilterManager extends LoadableTypeManager<Filter> {
+    @Deprecated(forRemoval = false)
     enum Target {
         EndpointLoader
     }
@@ -78,11 +78,13 @@ public final class FilterManager extends LoadableTypeManager<Filter> {
                     continue;
                 }
             }
+            // FIXME reimplement this
+            /*
             try {
                 node.node(Target.EndpointLoader).set(link); // FIXME fix
             } catch (SerializationException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
         super.loadList(updatedList);
     }
