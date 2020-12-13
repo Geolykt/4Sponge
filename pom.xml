@@ -20,7 +20,7 @@
         <license>
             <name>MIT License (Expat)</name>
             <url>http://opensource.org/licenses/mit-license.php</url>
-            <distribution>repo</distribution>
+            <distribution>manual</distribution>
         </license>
     </licenses>
 
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.github.Minestom</groupId>
             <artifactId>Minestom</artifactId>
-            <version>8dfc52dd15</version>
+            <version>4ae623cdab</version>
             <scope>provided</scope>
             <!-- something that bricks maven ... -->
             <exclusions>
