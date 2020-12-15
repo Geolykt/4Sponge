@@ -1,4 +1,4 @@
-package org.kitteh.craftirc.messaging.processing;
+package org.kitteh.craftirc.messaging.formatting;
 
 import java.util.Collections;
 

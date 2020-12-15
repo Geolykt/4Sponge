@@ -29,10 +29,10 @@ import org.jetbrains.annotations.Nullable;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.event.IRCEventListener;
 import org.kitteh.craftirc.event.MinestomEventListener;
-import org.kitteh.craftirc.messaging.processing.IRCChatFormatter;
+import org.kitteh.craftirc.messaging.formatting.IRCChatFormatter;
+import org.kitteh.craftirc.messaging.formatting.MinestomChatFormatter;
 import org.kitteh.craftirc.messaging.processing.IRCColor;
 import org.kitteh.craftirc.messaging.processing.MessageProcessingStage;
-import org.kitteh.craftirc.messaging.processing.MinestomChatFormatter;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
 import org.kitteh.irc.client.library.feature.auth.NickServ;
@@ -57,7 +57,7 @@ public final class BotManager {
     public final Map<String, MinestomEventListener> listeners = new ConcurrentHashMap<>();
 
     /**
-     * Initialized by {@link CraftIRC} main.
+     * Initialised by {@link CraftIRC} main.
      *
      * @param bots list of bot data to load
      */
@@ -204,6 +204,9 @@ public final class BotManager {
         if (processors.node("colors-mc").getBoolean()) {
             bot.getToMinestom().registerPreprocessor(MessageProcessingStage.PROCESS, new IRCColor(false));
         }
+
+        // Add bot to channel
+        bot.addChannel(data.node("channel").getString());
 
         // register bot
         this.bots.put(name, bot);

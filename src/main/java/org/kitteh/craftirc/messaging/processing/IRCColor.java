@@ -100,11 +100,11 @@ public final class IRCColor implements Preprocessor {
     }
 
     private static String toMC(String input) {
-        Matcher matcher = Matches.IRC_PATTERN.matcher(input);
         input = input.replace(Format.BOLD.toString(), "");
         input = input.replace(Format.UNDERLINE.toString(), "");
         input = input.replace(Format.REVERSE.toString(), "");
         input = input.replace(Format.RESET.toString(), "\u00A7r");
+        Matcher matcher = Matches.IRC_PATTERN.matcher(input);
         int currentIndex = 0;
         StringBuilder builder = new StringBuilder();
         while (matcher.find()) {
@@ -119,7 +119,7 @@ public final class IRCColor implements Preprocessor {
             } catch (NumberFormatException ignored) {
                 continue;
             }
-            builder.append(Matches.getMCByIRC(i));
+            builder.append(Matches.getMCByIRC(i)); // TODO HEX Colors!
         }
         if (currentIndex < input.length()) {
             builder.append(input.substring(currentIndex));
