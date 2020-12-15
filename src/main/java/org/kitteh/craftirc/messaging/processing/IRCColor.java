@@ -1,49 +1,18 @@
-/*
- * * Copyright (C) 2014-2018 Matt Baxter http://kitteh.org
- * * Copyright (C) 2020 Emeric Werner https://geolykt.de
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy,
- * modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
- * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-package org.kitteh.craftirc.endpoint.filter.defaults;
-
-import org.jetbrains.annotations.NotNull;
-import org.kitteh.craftirc.endpoint.Endpoint;
-import org.kitteh.craftirc.endpoint.TargetedMessage;
-import org.kitteh.craftirc.endpoint.defaults.IRCEndpoint;
-import org.kitteh.craftirc.endpoint.filter.Filter;
-import org.kitteh.craftirc.util.WrappedMap;
-import org.kitteh.craftirc.util.loadable.Loadable;
-import org.kitteh.irc.client.library.util.Format;
+package org.kitteh.craftirc.messaging.processing;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.kitteh.irc.client.library.util.Format;
+
 /**
- * Color conversion.
+ * Converts IRC colors into MC colors
  */
-@Loadable.Type(name = "color")
-public class Colors extends Filter {
-    private enum Matches {
+public final class IRCColor implements Preprocessor {
+
+    private static enum Matches {
         BLACK(Format.BLACK, '0'),
         DARK_BLUE(Format.DARK_BLUE, '1'),
         DARK_GREEN(Format.DARK_GREEN, '2'),
@@ -70,9 +39,9 @@ public class Colors extends Filter {
         }
 
         private static final Map<Integer, String> IRC_MAP;
-        private static final Pattern IRC_PATTERN;
+        private static final Pattern IRC_PATTERN = Pattern.compile(Format.COLOR_CHAR + "([0-9]{1,2})(?:,[0-9]{1,2})?");
         private static final Map<Character, String> MC_MAP;
-        private static final Pattern MC_PATTERN;
+        private static final Pattern MC_PATTERN = Pattern.compile("\u00A7([a-z0-9])", Pattern.CASE_INSENSITIVE);
 
         static {
             IRC_MAP = new HashMap<>();
@@ -81,8 +50,6 @@ public class Colors extends Filter {
                 IRC_MAP.put(matches.irc.getColorChar(), "\u00A7" + matches.mc);
                 MC_MAP.put(matches.mc, matches.irc.toString());
             }
-            IRC_PATTERN = Pattern.compile(Format.COLOR_CHAR + "([0-9]{1,2})(?:,[0-9]{1,2})?");
-            MC_PATTERN = Pattern.compile("\u00A7([a-z0-9])", Pattern.CASE_INSENSITIVE);
         }
 
         static String getIRCByMC(char mc) {
@@ -94,27 +61,22 @@ public class Colors extends Filter {
         }
     }
 
-    @Override
-    public void processMessage(@NotNull TargetedMessage message) {
-        Endpoint origin = message.getTarget();
-        message.setCustomMessage(this.process(origin, message.getCustomMessage()));
-        WrappedMap<String, Object> map = message.getCustomData();
-        this.process(origin, map, Endpoint.SENDER_NAME);
-        this.process(origin, map, Endpoint.MESSAGE_TEXT);
+    private final boolean toIRC;
+
+    public IRCColor(boolean isToIRC) {
+        toIRC = isToIRC;
     }
 
-    private void process(Endpoint origin, WrappedMap<String, Object> map, String key) {
-        Object o = map.get(key);
-        if (o instanceof String) {
-            map.put(key, this.process(origin, (String) map.get(key)));
+    @Override
+    public final void preProcess(PreprocessedMessage msg) {
+        if (toIRC) {
+            msg.setMessage(toIRC(msg.getMessage()));
+        } else {
+            msg.setMessage(toMC(msg.getMessage()));
         }
     }
 
-    private String process(Endpoint origin, String original) {
-        return origin instanceof IRCEndpoint ? toIRC(original) : toMC(original);
-    }
-
-    private String toIRC(String input) {
+    private static String toIRC(String input) {
         Matcher matcher = Matches.MC_PATTERN.matcher(input);
         int currentIndex = 0;
         StringBuilder builder = new StringBuilder();
@@ -137,7 +99,7 @@ public class Colors extends Filter {
         return builder.append(Format.RESET).toString();
     }
 
-    private String toMC(String input) {
+    private static String toMC(String input) {
         Matcher matcher = Matches.IRC_PATTERN.matcher(input);
         input = input.replace(Format.BOLD.toString(), "");
         input = input.replace(Format.UNDERLINE.toString(), "");

@@ -1,38 +1,39 @@
 bots:
   - host: localhost
-    name: MyInternalBotName
-    nick: CraftIRC
+    user: CraftIRC
+    nick: Minestom
+    realname: "CraftIRC Bot"
+    name: INTERN # this is only used for internal lookup so should be unique for each bot
+    channel: "#craftirc" # the IRC channel to listen and send messages to
+    ssl: false
+    port: 6667
+    password: null
+    bind:
+      host: null
+      port: 0
+    auth:
+      user: null
+      pass: null
+      nickless: false
+
     debug-output:
       exceptions: false
       input: false
       output: false
-endpoints:
-  - name: Chat
-    type: mc-chat
-  - name: Join
-    type: mc-join
-  - name: Quit
-    type: mc-quit
-  - name: IRC
-    type: irc
-    extra:
-      bot: MyInternalBotName
-      channel: "#craftirc"
-links:
-  - source: Chat
-    target: IRC
-    filters:
-      - colorize
-  - source: IRC
-    target: Chat
-    filters:
-      - colorize
-      - type: datamapper
-        message: "[IRC] <%IRC_PREFIX%%SENDER_NAME%> %MESSAGE_TEXT%"
-  - source: Join
-    target: IRC
-  - source: Quit
-    target: IRC
-repeatable-filters:
-  colorize:
-    type: color
+    event:
+      irc-join: true # unused
+      irc-quit: true # unused
+      irc-chat: true
+      mc-chat: true
+      mc-join: true
+      mc-quit: true
+    format:
+      irc-join: "*IRC ${user} joined."
+      irc-quit: "*IRC ${user} left."
+      irc-chat: "*IRC <${user}>: ${msg}"
+      mc-join: "${user} joined."
+      mc-quit: "${user} left."
+      mc-chat: "${user}: ${msg}"
+    processors:
+      colors-irc: true # Converts MC/Minestom colors into IRC Colors
+      colors-mc: true # Converts IRC colors into Minestom colors.

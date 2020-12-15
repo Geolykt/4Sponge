@@ -27,10 +27,21 @@ package org.kitteh.craftirc.irc;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.craftirc.CraftIRC;
+import org.kitteh.craftirc.event.IRCEventListener;
+import org.kitteh.craftirc.event.MinestomEventListener;
+import org.kitteh.craftirc.messaging.processing.IRCChatFormatter;
+import org.kitteh.craftirc.messaging.processing.IRCColor;
+import org.kitteh.craftirc.messaging.processing.MessageProcessingStage;
+import org.kitteh.craftirc.messaging.processing.MinestomChatFormatter;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
 import org.kitteh.irc.client.library.feature.auth.NickServ;
 import org.spongepowered.configurate.ConfigurationNode;
+
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.event.player.PlayerChatEvent;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
+import net.minestom.server.event.player.PlayerLoginEvent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -43,18 +54,28 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class BotManager {
     private final Map<String, IRCBot> bots = new ConcurrentHashMap<>();
-    private final CraftIRC plugin;
+    public final Map<String, MinestomEventListener> listeners = new ConcurrentHashMap<>();
 
     /**
      * Initialized by {@link CraftIRC} main.
      *
-     * @param plugin the CraftIRC instance
      * @param bots list of bot data to load
      */
-    public BotManager(@NotNull CraftIRC plugin, @NotNull List<? extends ConfigurationNode> bots) {
-        this.plugin = plugin;
-        this.plugin.trackShutdownable(() -> BotManager.this.bots.values().forEach(IRCBot::shutdown));
+    public BotManager(@NotNull List<? extends ConfigurationNode> bots) {
         this.loadBots(bots);
+    }
+
+    public void shutdown() {
+        bots.forEach((name, bot) -> bot.shutdown());
+    }
+
+    /**
+     * Obtains a set of entries of the bots that are known to the BotManager.
+     * The Key of the entries is the name of the bot, the value the bot itself.
+     * @return The bots known to the BotManager
+     */
+    public final Set<Map.Entry<String, IRCBot>> getBots() {
+        return bots.entrySet();
     }
 
     /**
@@ -102,20 +123,14 @@ public final class BotManager {
         botBuilder.server().host(data.node("host").getString("localhost"));
         SecurityType security = data.node("ssl").getBoolean() ? SecurityType.SECURE : SecurityType.INSECURE;
         botBuilder.server().port(data.node("port").getInt(6667), security);
-        ConfigurationNode password = data.node("password");
-        if (!password.virtual()) {
-            botBuilder.server().password(password.getString());
-        }
+        botBuilder.server().password(data.node("password").getString());
         botBuilder.user(data.node("user").getString("CraftIRC"));
         botBuilder.realName(data.node("realname").getString("CraftIRC Bot"));
+        botBuilder.nick(data.node("nick").getString("CraftIRC"));
 
         ConfigurationNode bind = data.node("bind");
-        ConfigurationNode bindHost = bind.node("host");
-        if (!bindHost.virtual()) {
-            botBuilder.bind().host(bindHost.getString());
-        }
+        botBuilder.bind().host(bind.node("host").getString());
         botBuilder.bind().port(bind.node("port").getInt(0));
-        botBuilder.nick(data.node("nick").getString("CraftIRC"));
 
         ConfigurationNode auth = data.node("auth");
         String authUser = auth.node("user").getString();
@@ -143,6 +158,54 @@ public final class BotManager {
 
         newBot.connect();
 
-        this.bots.put(name, new IRCBot(this.plugin, name, newBot));
+        final IRCBot bot = new IRCBot(name, newBot);
+
+        ConfigurationNode events = data.node("event");
+        ConfigurationNode format = data.node("format");
+        ConfigurationNode processors = data.node("processors");
+
+        // register IRC events
+        if (events.node("irc-chat").getBoolean()) {
+            bot.getClient().getEventManager().registerEventListener(new IRCEventListener(bot.getToMinestom()));
+        }
+
+        // register minecraft events
+        MinestomEventListener mcEvents = new MinestomEventListener(bot.getToIRC());
+        if (events.node("mc-chat").getBoolean()) {
+            MinecraftServer.getConnectionManager().addPlayerInitialization(player -> {
+                player.addEventCallback(PlayerChatEvent.class, mcEvents::onPlayerChat);
+            });
+        }
+        if (events.node("mc-join").getBoolean()) {
+            MinecraftServer.getConnectionManager().addPlayerInitialization(player -> {
+                player.addEventCallback(PlayerLoginEvent.class, mcEvents::onPlayerJoin);
+            });
+        }
+        if (events.node("mc-quit").getBoolean()) {
+            MinecraftServer.getConnectionManager().addPlayerInitialization(player -> {
+                player.addEventCallback(PlayerDisconnectEvent.class, mcEvents::onPlayerLeave);
+            });
+        }
+
+        // register formatters
+        bot.getToIRC().registerProcessor(MessageProcessingStage.FORMAT, 
+                new IRCChatFormatter(format.node("irc-chat").getString(), 
+                        format.node("irc-join").getString(), 
+                        format.node("irc-quit").getString()));
+        bot.getToMinestom().registerProcessor(MessageProcessingStage.FORMAT, 
+                new MinestomChatFormatter(format.node("mc-chat").getString(), 
+                        format.node("mc-join").getString(), 
+                        format.node("mc-quit").getString()));
+
+        // register preprocessors
+        if (processors.node("colors-irc").getBoolean()) {
+            bot.getToIRC().registerPreprocessor(MessageProcessingStage.PROCESS, new IRCColor(true));
+        }
+        if (processors.node("colors-mc").getBoolean()) {
+            bot.getToMinestom().registerPreprocessor(MessageProcessingStage.PROCESS, new IRCColor(false));
+        }
+
+        // register bot
+        this.bots.put(name, bot);
     }
 }

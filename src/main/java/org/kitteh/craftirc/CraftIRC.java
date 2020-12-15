@@ -33,19 +33,10 @@ import net.minestom.server.extensions.Extension;
 import net.minestom.server.utils.time.TimeUnit;
 
 import org.jetbrains.annotations.NotNull;
-import org.kitteh.craftirc.endpoint.Endpoint;
-import org.kitteh.craftirc.endpoint.EndpointManager;
-import org.kitteh.craftirc.endpoint.filter.FilterManager;
-import org.kitteh.craftirc.endpoint.link.LinkManager;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.exceptions.CraftIRCUnableToStartException;
 import org.kitteh.craftirc.exceptions.CraftIRCWillLeakTearsException;
 import org.kitteh.craftirc.irc.BotManager;
-import org.kitteh.craftirc.minestom.ChatEndpoint;
-import org.kitteh.craftirc.minestom.JoinEndpoint;
-import org.kitteh.craftirc.minestom.PermissionFilter;
-import org.kitteh.craftirc.minestom.QuitEndpoint;
-import org.kitteh.craftirc.util.shutdownable.Shutdownable;
 import org.slf4j.Logger;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
@@ -58,8 +49,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 public final class CraftIRC extends Extension {
 
@@ -68,7 +57,6 @@ public final class CraftIRC extends Extension {
 
     private File configDir;
 
-    private final Set<Endpoint> registeredEndpoints = new CopyOnWriteArraySet<>();
     private boolean reloading = false;
     private String version = null;
 
@@ -119,11 +107,6 @@ public final class CraftIRC extends Extension {
         this.dontMakeAGrownManCry();
     }
 
-    public void registerEndpoint(Endpoint endpoint) {
-        this.registeredEndpoints.add(endpoint);
-        endpoint.registerListener();
-    }
-
     private synchronized void startMeUp() {
         try {
             CraftIRC.loggy = getLogger();
@@ -145,47 +128,22 @@ public final class CraftIRC extends Extension {
                 throw new CraftIRCInvalidConfigException("Config doesn't appear valid. Would advise starting from scratch.");
             }
 
-            ConfigurationNode repeatableFilters = root.node("repeatable-filters");
-
             ConfigurationNode botsNode = root.node("bots");
             List<? extends ConfigurationNode> bots;
             if (botsNode.virtual() || (bots = botsNode.childrenList()).isEmpty()) {
                 throw new CraftIRCInvalidConfigException("No bots defined!");
             }
 
-            ConfigurationNode endpointsNode = root.node("endpoints");
-            List<? extends ConfigurationNode> endpoints;
-            if (endpointsNode.virtual() || (endpoints = endpointsNode.childrenList()).isEmpty()) {
-                throw new CraftIRCInvalidConfigException("No endpoints defined! Would advise starting from scratch.");
-            }
-
-            ConfigurationNode linksNode = root.node("links");
-            List<? extends ConfigurationNode> links;
-            if (linksNode.virtual() || (links = linksNode.childrenList()).isEmpty()) {
-                throw new CraftIRCInvalidConfigException("No links defined! How can your endpoints be useful?");
-            }
-
-            this.filterManager = new FilterManager(this, repeatableFilters);
-            this.botManager = new BotManager(this, bots);
-            this.endpointManager = new EndpointManager(this, endpoints);
-            this.linkManager = new LinkManager(this, links);
+            this.botManager = new BotManager(bots);
         } catch (Exception e) {
             this.getLogger().error("Uh oh", new CraftIRCUnableToStartException("Could not start CraftIRC!", e));
             this.dontMakeAGrownManCry();
             return;
         }
-        this.getFilterManager().registerArgumentProvider(CraftIRC.class, () -> CraftIRC.this);
-        this.getFilterManager().registerType(PermissionFilter.class);
-        this.getEndpointManager().registerArgumentProvider(CraftIRC.class, () -> CraftIRC.this);
-        this.getEndpointManager().registerType(ChatEndpoint.class);
-        this.getEndpointManager().registerType(JoinEndpoint.class);
-        this.getEndpointManager().registerType(QuitEndpoint.class);
     }
 
     private synchronized void dontMakeAGrownManCry() {
-        registeredEndpoints.forEach(endpoint -> endpoint.unregisterListeners());
-        this.registeredEndpoints.clear();
-        this.shutdownables.forEach(Shutdownable::shutdown);
+        getBotManager().shutdown();
         // And lastly...
         CraftIRC.loggy = null;
     }
@@ -199,38 +157,10 @@ public final class CraftIRC extends Extension {
     }
 
     private BotManager botManager;
-    private EndpointManager endpointManager;
-    private FilterManager filterManager;
-    private LinkManager linkManager;
-    private final Set<Shutdownable> shutdownables = new CopyOnWriteArraySet<>();
 
     @NotNull
     public BotManager getBotManager() {
         return this.botManager;
-    }
-
-    @NotNull
-    public EndpointManager getEndpointManager() {
-        return this.endpointManager;
-    }
-
-    @NotNull
-    public FilterManager getFilterManager() {
-        return this.filterManager;
-    }
-
-    @NotNull
-    public LinkManager getLinkManager() {
-        return this.linkManager;
-    }
-
-    /**
-     * Starts tracking a feature which can be shut down.
-     *
-     * @param shutdownable feature to track
-     */
-    public void trackShutdownable(@NotNull Shutdownable shutdownable) {
-        this.shutdownables.add(shutdownable);
     }
 
     private void saveDefaultConfig(@NotNull File dataFolder) {

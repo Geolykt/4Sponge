@@ -1,15 +1,13 @@
-CraftIRC 4 - Minestom
-=====================
+CraftIRC Minestom 5
+===================
 
-A fork of the CraftIRC 4Sponge project so instead of sponge Minestom support is aimed
-Due to the nature of how the code is structured I am unable to fix any non-critical
-bugs, these include things such as formatting not being performed as expected 
-or the configuration being not parsed correctly.
+This is still not in a stable-ish format --- usage at your own risk!
 
-However I will attempt to use an older version of the application which has a different
-structure, this would (hopefully) allow me to maintain the code with a better efficency
-as well as allowing me to refractor some things without having to resort to refractor the
-entire project.
+---
+
+A fork of the CraftIRC 4 - Sponge project so instead of sponge Minestom support is aimed
+CraftIRC Minestom 5 however has drastic changes compared to version 4 to allow
+for easier maintainance and usage on my side of things.
 
 ------------------------------
 
@@ -17,6 +15,4 @@ Links!
 ------
 * [License](https://github.com/Geolykt/CraftIRC/blob/MinestomIRC/LICENSE)
 * [Issue Tracker](https://github.com/Geolykt/CraftIRC/issues)
-* [CraftIRC 4 Base Code](https://github.com/Geolykt/CraftIRC)
-
-I'm half expecting mbax to show up and declare CraftIRC as dead
+* [CraftIRC 4 Base Code](https://github.com/CraftIRC/4)
