@@ -10,8 +10,6 @@
           "url": "https://repo1.maven.org/maven2/"
         }
     ],
-    "artifacts": [
-    	"org.apache.commons:commons-text:jar:1.9"
-    ]
+    "artifacts": []
   }
 }

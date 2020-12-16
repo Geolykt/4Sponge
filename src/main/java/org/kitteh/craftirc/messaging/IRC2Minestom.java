@@ -128,7 +128,7 @@ public class IRC2Minestom {
     }
 
     public void issueMessage(String playername, String messageContent) {
-        final PreprocessedMessage preMSG = new PreprocessedMessage(playername, messageContent);
+        final PreprocessedMessage preMSG = new PreprocessedMessage(messageContent, playername);
         earliestProcessors.forEach(proc -> proc.preProcess(preMSG));
         earlyProcessors.forEach(proc -> proc.preProcess(preMSG));
         final Message msg = new Message(playername, preMSG.getMessage());

@@ -146,7 +146,7 @@
     <dependency>
       <groupId>com.github.Minestom</groupId>
       <artifactId>Minestom</artifactId>
-      <version>7bcca8ff9f</version>
+      <version>ed46bd0dc2</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -163,12 +163,6 @@
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>
       <version>19.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-text</artifactId>
-      <version>1.9</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

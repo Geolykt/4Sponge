@@ -24,9 +24,6 @@
  */
 package org.kitteh.craftirc.messaging.formatting;
 
-import java.util.Collections;
-
-import org.apache.commons.text.StringSubstitutor;
 import org.kitteh.craftirc.messaging.IRC2Minestom;
 
 import net.minestom.server.chat.ColoredText;
@@ -48,13 +45,13 @@ public class MinestomChatFormatter implements IRC2Minestom.Processor {
         String legacyString;
         switch (msg.getType()) {
         case CHAT:
-            legacyString = new StringSubstitutor(new SubstitutionMap(msg.getUser(), msg.getOriginal())).replace(chat);
+            legacyString = chat.replaceAll("\\$\\{user}", msg.getUser()).replaceAll("\\$\\{msg}", msg.getOriginal());
             break;
         case JOIN:
-            legacyString = new StringSubstitutor(Collections.singletonMap("user", msg.getUser())).replace(join);
+            legacyString = join.replaceAll("\\$\\{user}", msg.getUser());
             break;
         case QUIT:
-            legacyString = new StringSubstitutor(Collections.singletonMap("user", msg.getUser())).replace(quit);
+            legacyString = quit.replaceAll("\\$\\{user}", msg.getUser());
             break;
         default:
             throw new IllegalArgumentException();

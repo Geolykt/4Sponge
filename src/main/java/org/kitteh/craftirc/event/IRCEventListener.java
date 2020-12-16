@@ -42,7 +42,12 @@ public class IRCEventListener {
 
     @Handler(delivery = Invoke.Asynchronously)
     public void message(@NotNull ChannelMessageEvent event) {
-        handlingInstance.issueMessage(event.getActor().getNick(), event.getMessage());
+        try {
+            handlingInstance.issueMessage(event.getActor().getNick(), event.getMessage());
+        } catch (RuntimeException e) {
+            // TODO logger
+            e.printStackTrace();
+        }
     }
 
     // TODO JOIN/QUIT

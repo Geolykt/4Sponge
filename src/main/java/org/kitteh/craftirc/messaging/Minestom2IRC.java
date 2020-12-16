@@ -64,7 +64,6 @@ public class Minestom2IRC {
             user = player;
             type = join ? MessageType.JOIN : MessageType.QUIT;
             message = null;
-            formattedMessage = player + " has " + type.toString();
         }
 
         public void setFormattedMessage(String newMessage) {
@@ -133,7 +132,7 @@ public class Minestom2IRC {
     }
 
     public void issueMessage(String playername, String messageContent) {
-        final PreprocessedMessage preMSG = new PreprocessedMessage(playername, messageContent);
+        final PreprocessedMessage preMSG = new PreprocessedMessage(messageContent, playername);
         earliestProcessors.forEach(proc -> proc.preProcess(preMSG));
         earlyProcessors.forEach(proc -> proc.preProcess(preMSG));
         final Message msg = new Message(playername, preMSG.getMessage());

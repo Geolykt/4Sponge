@@ -40,14 +40,27 @@ public final class MinestomEventListener {
 
     public final void onPlayerChat(PlayerChatEvent event) {
         // TODO also allow for nicks sometime in the future
-        reportingInstance.issueMessage(event.getPlayer().getUsername(), event.getMessage());
+        // TODO logger
+        try {
+            reportingInstance.issueMessage(event.getPlayer().getUsername(), event.getMessage());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
     }
 
     public final void onPlayerJoin(PlayerLoginEvent event) {
-        reportingInstance.issueJoin(event.getPlayer().getUsername());
+        try {
+            reportingInstance.issueJoin(event.getPlayer().getUsername());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
     }
 
     public final void onPlayerLeave(PlayerDisconnectEvent event) {
-        reportingInstance.issueQuit(event.getPlayer().getUsername());
+        try {
+            reportingInstance.issueQuit(event.getPlayer().getUsername());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
     }
 }
