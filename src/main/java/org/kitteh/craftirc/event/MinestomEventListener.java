@@ -40,7 +40,7 @@ public final class MinestomEventListener {
 
     public final void onPlayerChat(PlayerChatEvent event) {
         // TODO also allow for nicks sometime in the future
-        reportingInstance.issueMessage(event.getSender().getUsername(), event.getMessage());
+        reportingInstance.issueMessage(event.getPlayer().getUsername(), event.getMessage());
     }
 
     public final void onPlayerJoin(PlayerLoginEvent event) {
