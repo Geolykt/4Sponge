@@ -26,7 +26,7 @@ package org.kitteh.craftirc.messaging.processing;
 
 import com.google.common.collect.ImmutableMap;
 
-import net.minestom.server.chat.ChatColor;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * Converts IRC colors into MC colors
@@ -71,23 +71,23 @@ public final class IRCColor implements Preprocessor {
             .put('f', "0") // white
             .build();
 
-    public static final ImmutableMap<String, ChatColor> IRC_TO_MC = new ImmutableMap.Builder<String, ChatColor>()
-            .put("00", ChatColor.WHITE) // white
-            .put("01", ChatColor.BLACK) // black
-            .put("02", ChatColor.DARK_BLUE) // dark blue
-            .put("03", ChatColor.DARK_GREEN) // dark green
-            .put("04", ChatColor.RED) // red
-            .put("05", ChatColor.DARK_RED) // dark red
-            .put("06", ChatColor.PURPLE) // dark purple
-            .put("07", ChatColor.GOLD) // gold
-            .put("08", ChatColor.YELLOW) // yellow
-            .put("09", ChatColor.BRIGHT_GREEN) // green
-            .put("10", ChatColor.DARK_CYAN) // dark aqua/cyan
-            .put("11", ChatColor.CYAN) // aqua / cyan
-            .put("12", ChatColor.BLUE) // blue
-            .put("13", ChatColor.PINK) // light purple
-            .put("14", ChatColor.DARK_GRAY) // dark gray
-            .put("15", ChatColor.GRAY) // gray
+    public static final ImmutableMap<String, TextFormatting> IRC_TO_MC = new ImmutableMap.Builder<String, TextFormatting>()
+            .put("00", TextFormatting.WHITE) // white
+            .put("01", TextFormatting.BLACK) // black
+            .put("02", TextFormatting.DARK_BLUE) // dark blue
+            .put("03", TextFormatting.DARK_GREEN) // dark green
+            .put("04", TextFormatting.RED) // red
+            .put("05", TextFormatting.DARK_RED) // dark red
+            .put("06", TextFormatting.DARK_PURPLE) // dark purple
+            .put("07", TextFormatting.GOLD) // gold
+            .put("08", TextFormatting.YELLOW) // yellow
+            .put("09", TextFormatting.GREEN) // green
+            .put("10", TextFormatting.DARK_AQUA) // dark aqua/cyan
+            .put("11", TextFormatting.AQUA) // aqua / cyan
+            .put("12", TextFormatting.BLUE) // blue
+            .put("13", TextFormatting.LIGHT_PURPLE) // light purple
+            .put("14", TextFormatting.DARK_GRAY) // dark gray
+            .put("15", TextFormatting.GRAY) // gray
             .build();
 
     private static String toIRC(String input) {
@@ -122,9 +122,9 @@ public final class IRCColor implements Preprocessor {
                     break;
                 }
                 if (Character.isDigit(original[i + 2])) {
-                    out.append(IRC_TO_MC.getOrDefault(original[++i] + "" + original[++i], ChatColor.WHITE));
+                    out.append(IRC_TO_MC.getOrDefault(original[++i] + "" + original[++i], TextFormatting.RESET));
                 } else {
-                    out.append(IRC_TO_MC.getOrDefault("0" + original[++i], ChatColor.WHITE));
+                    out.append(IRC_TO_MC.getOrDefault("0" + original[++i], TextFormatting.RESET));
                 }
             } else {
                 out.append(original[i]);

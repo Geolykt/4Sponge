@@ -1,11 +1,25 @@
-# This is a simple .gitignore for simple needs.
-
-# To ignore files system-wide, use the global git setting core.excludesfile
-# For repo-specific ignoring, use .git/info/exclude
-# To ignore the opinions of others, cover your ears and scream "LA LA LA!"
-
-# Maven makes this!
-target
+# eclipse
+bin
+*.launch
+.settings
+.metadata
 .classpath
 .project
-dependency-reduced-pom.xml
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+
+# Files from Forge MDK
+forge*changelog.txt

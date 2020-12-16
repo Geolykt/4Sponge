@@ -24,20 +24,26 @@
  */
 package org.kitteh.craftirc;
 
-import net.minestom.server.MinecraftServer;
-import net.minestom.server.chat.ChatColor;
-import net.minestom.server.chat.ColoredText;
-import net.minestom.server.command.builder.Command;
-import net.minestom.server.command.builder.arguments.ArgumentString;
-import net.minestom.server.extensions.Extension;
-import net.minestom.server.utils.time.TimeUnit;
+import net.minecraft.command.Commands;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import org.jetbrains.annotations.NotNull;
+import org.apache.logging.log4j.LogManager;
+import org.kitteh.craftirc.commands.ForgeIRCCommand;
 import org.kitteh.craftirc.exceptions.CraftIRCInvalidConfigException;
 import org.kitteh.craftirc.exceptions.CraftIRCUnableToStartException;
 import org.kitteh.craftirc.exceptions.CraftIRCWillLeakTearsException;
 import org.kitteh.craftirc.irc.BotManager;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
@@ -46,72 +52,48 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-public final class CraftIRC extends Extension {
+import javax.annotation.Nonnull;
 
-    private static Logger loggy;
+@Mod("forgeirc")
+public final class CraftIRC {
+
+    private static final Logger LOGGY = LogManager.getLogger();
     private static final String PERMISSION_RELOAD = "craftirc.reload";
 
     private File configDir;
 
     private boolean reloading = false;
-    private String version = null;
 
-    @Override
-    public void preInitialize() {
-        version = this.getDescription().getVersion();
+    public CraftIRC() {
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @Override
-    public void initialize() {
-        Command mainCommand = new Command("craftirc");
-        mainCommand.addSyntax((commandSource, args) -> {
-            if (!commandSource.hasPermission(PERMISSION_RELOAD)) {
-                return;
-            }
-            String arg = args.getString("arg");
-            switch (arg) {
-            case "reload":
-                if (this.reloading) {
-                    commandSource.sendMessage(ColoredText.of(ChatColor.RED, "CraftIRC reload already in progress"));
-                } else {
-                    this.reloading = true;
-                    commandSource.sendMessage(ColoredText.of(ChatColor.CYAN, "CraftIRC reload scheduled!"));
-                    MinecraftServer.getSchedulerManager().buildTask(() -> {
-                        this.dontMakeAGrownManCry();
-                        this.startMeUp();
-                        this.reloading = false;
-                    }).delay(1, TimeUnit.TICK);
-                }
-            default:
-                
-            }
-        }, new ArgumentString("arg"));
-        mainCommand.setDefaultExecutor((commandSource, args) -> {
-            commandSource.sendMessage(ChatColor.CYAN + "CraftIRC version " + ChatColor.RESET + this.version + ChatColor.CYAN +  " - Powered by Kittens\n"
-                    + ChatColor.DARK_CYAN + "Original by mbaxter, ported to minestom by geolykt.");
-        });
-        MinecraftServer.getCommandManager().register(mainCommand);
+    private final ForgeIRCCommand cmd = new ForgeIRCCommand("5.0.0"); // TODO externalise version
+
+    @SubscribeEvent
+    private void setup(final RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("forgeirc").executes(cmd));
     }
 
-    @Override
-    public void postInitialize() {
-        this.startMeUp();
+    @SubscribeEvent
+    private void setup(final FMLServerStartingEvent event) {
+        startMeUp(event.getServer());
     }
 
-    @Override
-    public void terminate() {
+    @SubscribeEvent
+    public void terminate(final FMLServerStoppingEvent event) {
         this.dontMakeAGrownManCry();
     }
 
-    private synchronized void startMeUp() {
+    private synchronized void startMeUp(MinecraftServer server) {
         try {
-            CraftIRC.loggy = getLogger();
             if (configDir == null) {
-                configDir = new File(MinecraftServer.getExtensionManager().getExtensionFolder(), "craftIRC");
+                configDir = new File(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile(), "forgeirc");
                 configDir.mkdirs();
             }
 
@@ -134,9 +116,9 @@ public final class CraftIRC extends Extension {
                 throw new CraftIRCInvalidConfigException("No bots defined!");
             }
 
-            this.botManager = new BotManager(bots);
+            this.botManager = new BotManager(bots, server);
         } catch (Exception e) {
-            this.getLogger().error("Uh oh", new CraftIRCUnableToStartException("Could not start CraftIRC!", e));
+            LOGGY.error("Uh oh", new CraftIRCUnableToStartException("Could not start CraftIRC!", e));
             this.dontMakeAGrownManCry();
             return;
         }
@@ -144,26 +126,21 @@ public final class CraftIRC extends Extension {
 
     private synchronized void dontMakeAGrownManCry() {
         getBotManager().shutdown();
-        // And lastly...
-        CraftIRC.loggy = null;
     }
 
-    @NotNull
+    @Nonnull
     public static Logger log() {
-        if (CraftIRC.loggy == null) {
-            throw new CraftIRCWillLeakTearsException();
-        }
-        return CraftIRC.loggy;
+        return LOGGY;
     }
 
     private BotManager botManager;
 
-    @NotNull
+    @Nonnull
     public BotManager getBotManager() {
         return this.botManager;
     }
 
-    private void saveDefaultConfig(@NotNull File dataFolder) {
+    private void saveDefaultConfig(@Nonnull File dataFolder) {
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }

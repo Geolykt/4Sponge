@@ -24,7 +24,8 @@
  */
 package org.kitteh.craftirc.event;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+
 import org.kitteh.craftirc.messaging.IRC2Minestom;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 
@@ -41,7 +42,7 @@ public class IRCEventListener {
 
 
     @Handler(delivery = Invoke.Asynchronously)
-    public void message(@NotNull ChannelMessageEvent event) {
+    public void message(@Nonnull ChannelMessageEvent event) {
         try {
             handlingInstance.issueMessage(event.getActor().getNick(), event.getMessage());
         } catch (RuntimeException e) {

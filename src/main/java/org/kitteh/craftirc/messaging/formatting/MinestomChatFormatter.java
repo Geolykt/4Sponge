@@ -26,7 +26,7 @@ package org.kitteh.craftirc.messaging.formatting;
 
 import org.kitteh.craftirc.messaging.IRC2Minestom;
 
-import net.minestom.server.chat.ColoredText;
+import net.minecraft.util.text.StringTextComponent;
 
 public class MinestomChatFormatter implements IRC2Minestom.Processor {
 
@@ -56,7 +56,7 @@ public class MinestomChatFormatter implements IRC2Minestom.Processor {
         default:
             throw new IllegalArgumentException();
         }
-        msg.setFormattedMessage(ColoredText.of(rawMessage));
+        msg.setFormattedMessage(new StringTextComponent(rawMessage));
     }
 
 }

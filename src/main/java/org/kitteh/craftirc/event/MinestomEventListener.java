@@ -26,9 +26,9 @@ package org.kitteh.craftirc.event;
 
 import org.kitteh.craftirc.messaging.Minestom2IRC;
 
-import net.minestom.server.event.player.PlayerChatEvent;
-import net.minestom.server.event.player.PlayerDisconnectEvent;
-import net.minestom.server.event.player.PlayerLoginEvent;
+import net.minecraftforge.event.ServerChatEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 
 public final class MinestomEventListener {
 
@@ -38,27 +38,27 @@ public final class MinestomEventListener {
         reportingInstance = m2irc;
     }
 
-    public final void onPlayerChat(PlayerChatEvent event) {
+    public final void onPlayerChat(ServerChatEvent event) {
         // TODO also allow for nicks sometime in the future
         // TODO logger
         try {
-            reportingInstance.issueMessage(event.getPlayer().getUsername(), event.getMessage());
+            reportingInstance.issueMessage(event.getUsername(), event.getMessage());
         } catch (RuntimeException e) {
             e.printStackTrace();
         }
     }
 
-    public final void onPlayerJoin(PlayerLoginEvent event) {
+    public final void onPlayerJoin(PlayerLoggedInEvent event) {
         try {
-            reportingInstance.issueJoin(event.getPlayer().getUsername());
+            reportingInstance.issueJoin(event.getPlayer().getName().getString());
         } catch (RuntimeException e) {
             e.printStackTrace();
         }
     }
 
-    public final void onPlayerLeave(PlayerDisconnectEvent event) {
+    public final void onPlayerLeave(PlayerLoggedOutEvent event) {
         try {
-            reportingInstance.issueQuit(event.getPlayer().getUsername());
+            reportingInstance.issueQuit(event.getPlayer().getName().getString());
         } catch (RuntimeException e) {
             e.printStackTrace();
         }

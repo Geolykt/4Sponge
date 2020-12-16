@@ -26,11 +26,14 @@ package org.kitteh.craftirc.irc;
 
 import java.util.LinkedList;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+
 import org.kitteh.craftirc.messaging.IRC2Minestom;
 import org.kitteh.craftirc.messaging.Minestom2IRC;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.element.Channel;
+
+import net.minecraft.server.MinecraftServer;
 
 /**
  * Wraps an IRC client and handles events.
@@ -42,11 +45,11 @@ public final class IRCBot {
     private final IRC2Minestom minestom;
     private final Minestom2IRC irc;
 
-    IRCBot(@NotNull String name, final @NotNull Client client) {
+    IRCBot(@Nonnull String name, final @Nonnull Client client, final @Nonnull MinecraftServer server) {
         this.client = client;
         this.name = name;
 
-        minestom = new IRC2Minestom();
+        minestom = new IRC2Minestom(server);
         irc = new Minestom2IRC(this, new LinkedList<>());
 
     }
@@ -56,7 +59,7 @@ public final class IRCBot {
      *
      * @return bot name
      */
-    @NotNull
+    @Nonnull
     public String getName() {
         return this.name;
     }
@@ -66,7 +69,7 @@ public final class IRCBot {
      *
      * @param channel channel to join
      */
-    public void addChannel(@NotNull String channel) {
+    public void addChannel(@Nonnull String channel) {
         this.client.addChannel(channel);
         this.irc.addChannel(channel);
     }
@@ -77,7 +80,7 @@ public final class IRCBot {
      * @param target target channel
      * @param message message to send
      */
-    public void sendMessage(@NotNull Channel target, @NotNull String message) {
+    public void sendMessage(@Nonnull Channel target, @Nonnull String message) {
         this.client.sendMessage(target.getName(), message);
     }
 
@@ -87,7 +90,7 @@ public final class IRCBot {
      * @param target target
      * @param message message to send
      */
-    public void sendMessage(@NotNull String target, @NotNull String message) {
+    public void sendMessage(@Nonnull String target, @Nonnull String message) {
         this.client.sendMessage(target, message);
     }
 

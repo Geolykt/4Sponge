@@ -28,8 +28,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.kitteh.craftirc.irc.IRCBot;
 import org.kitteh.craftirc.messaging.processing.MessageProcessingStage;
 import org.kitteh.craftirc.messaging.processing.PreprocessedMessage;
@@ -43,12 +44,12 @@ public class Minestom2IRC {
      */
     public static class Message {
 
-        protected final @NotNull String user;
+        protected final @Nonnull String user;
         protected final @Nullable String message;
-        protected final @NotNull MessageType type;
+        protected final @Nonnull MessageType type;
         protected String formattedMessage;
 
-        public Message(@NotNull String sender, @NotNull String messageContent) {
+        public Message(@Nonnull String sender, @Nonnull String messageContent) {
             user = sender;
             type = MessageType.CHAT;
             message = messageContent;
@@ -60,7 +61,7 @@ public class Minestom2IRC {
          * @param player The affected user
          * @param join True to indicate join, false to indicate quit
          */
-        public Message(@NotNull String player, boolean join) {
+        public Message(@Nonnull String player, boolean join) {
             user = player;
             type = join ? MessageType.JOIN : MessageType.QUIT;
             message = null;
@@ -103,7 +104,7 @@ public class Minestom2IRC {
     private Set<Processor> mediumProcessors = new HashSet<>();
     private Set<Processor> lateProcessors = new HashSet<>();
 
-    public void registerProcessor (@NotNull MessageProcessingStage stage, @NotNull Processor processor) {
+    public void registerProcessor (@Nonnull MessageProcessingStage stage, @Nonnull Processor processor) {
         switch (stage) {
         case PROCESS:
         case POST_PROCESS:
@@ -117,7 +118,7 @@ public class Minestom2IRC {
         }
     }
 
-    public void registerPreprocessor (@NotNull MessageProcessingStage stage, @NotNull Preprocessor processor) {
+    public void registerPreprocessor (@Nonnull MessageProcessingStage stage, @Nonnull Preprocessor processor) {
         switch (stage) {
         case PROCESS:
             earliestProcessors.add(processor);

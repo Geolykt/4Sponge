@@ -24,8 +24,6 @@
  */
 package org.kitteh.craftirc.irc;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.kitteh.craftirc.CraftIRC;
 import org.kitteh.craftirc.event.IRCEventListener;
 import org.kitteh.craftirc.event.MinestomEventListener;
@@ -38,16 +36,17 @@ import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
 import org.kitteh.irc.client.library.feature.auth.NickServ;
 import org.spongepowered.configurate.ConfigurationNode;
 
-import net.minestom.server.MinecraftServer;
-import net.minestom.server.event.player.PlayerChatEvent;
-import net.minestom.server.event.player.PlayerDisconnectEvent;
-import net.minestom.server.event.player.PlayerLoginEvent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Manages IRC bots.
@@ -61,7 +60,7 @@ public final class BotManager {
      *
      * @param bots list of bot data to load
      */
-    public BotManager(@NotNull List<? extends ConfigurationNode> bots) {
+    public BotManager(@Nonnull List<? extends ConfigurationNode> bots) {
         this.loadBots(bots);
     }
 
@@ -85,11 +84,11 @@ public final class BotManager {
      * @return named bot or null if no such bot exists
      */
     @Nullable
-    public IRCBot getBot(@NotNull String name) {
+    public IRCBot getBot(@Nonnull String name) {
         return this.bots.get(name);
     }
 
-    private void loadBots(@NotNull List<? extends ConfigurationNode> list) {
+    private void loadBots(@Nonnull List<? extends ConfigurationNode> list, MinecraftServer server) {
         Set<String> usedBotNames = new HashSet<>();
         int nonMap = 0;
         int noName = 0;
@@ -107,7 +106,7 @@ public final class BotManager {
                 CraftIRC.log().warn(String.format("Ignoring duplicate bot with name %s", name));
                 continue;
             }
-            this.addBot(name, node);
+            this.addBot(name, node, server);
         }
         if (nonMap > 0) {
             CraftIRC.log().warn(String.format("Bots list contained %d entries which were not maps", nonMap));
@@ -117,7 +116,7 @@ public final class BotManager {
         }
     }
 
-    private void addBot(@NotNull String name, @NotNull ConfigurationNode data) {
+    private void addBot(@Nonnull String name, @Nonnull ConfigurationNode data, MinecraftServer mcServer) {
         Client.Builder botBuilder = Client.builder();
         botBuilder.name(name);
         botBuilder.server().host(data.node("host").getString("localhost"));
@@ -158,7 +157,7 @@ public final class BotManager {
 
         newBot.connect();
 
-        final IRCBot bot = new IRCBot(name, newBot);
+        final IRCBot bot = new IRCBot(name, newBot, mcServer);
 
         ConfigurationNode events = data.node("event");
         ConfigurationNode format = data.node("format");
@@ -172,19 +171,13 @@ public final class BotManager {
         // register minecraft events
         MinestomEventListener mcEvents = new MinestomEventListener(bot.getToIRC());
         if (events.node("mc-chat").getBoolean()) {
-            MinecraftServer.getConnectionManager().addPlayerInitialization(player -> {
-                player.addEventCallback(PlayerChatEvent.class, mcEvents::onPlayerChat);
-            });
+            MinecraftForge.EVENT_BUS.addListener(mcEvents::onPlayerChat);
         }
         if (events.node("mc-join").getBoolean()) {
-            MinecraftServer.getConnectionManager().addPlayerInitialization(player -> {
-                player.addEventCallback(PlayerLoginEvent.class, mcEvents::onPlayerJoin);
-            });
+            MinecraftForge.EVENT_BUS.addListener(mcEvents::onPlayerJoin);
         }
         if (events.node("mc-quit").getBoolean()) {
-            MinecraftServer.getConnectionManager().addPlayerInitialization(player -> {
-                player.addEventCallback(PlayerDisconnectEvent.class, mcEvents::onPlayerLeave);
-            });
+            MinecraftForge.EVENT_BUS.addListener(mcEvents::onPlayerLeave);
         }
 
         // register formatters

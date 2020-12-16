@@ -27,14 +27,15 @@ package org.kitteh.craftirc.messaging;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.kitteh.craftirc.messaging.processing.MessageProcessingStage;
 import org.kitteh.craftirc.messaging.processing.PreprocessedMessage;
 import org.kitteh.craftirc.messaging.processing.Preprocessor;
 
-import net.minestom.server.MinecraftServer;
-import net.minestom.server.chat.JsonMessage;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.ITextComponent;
 
 public class IRC2Minestom {
 
@@ -44,12 +45,12 @@ public class IRC2Minestom {
      */
     public static class Message {
 
-        protected final @NotNull String user;
+        protected final @Nonnull String user;
         protected final @Nullable String message;
-        protected final @NotNull MessageType type;
-        protected @Nullable JsonMessage formattedMessage;
+        protected final @Nonnull MessageType type;
+        protected @Nullable ITextComponent formattedMessage;
 
-        public Message(@NotNull String sender, @NotNull String content) {
+        public Message(@Nonnull String sender, @Nonnull String content) {
             user = sender;
             type = MessageType.CHAT;
             message = content;
@@ -60,17 +61,17 @@ public class IRC2Minestom {
          * @param player The affected user
          * @param join True to indicate join, false to indicate quit
          */
-        public Message(@NotNull String player, boolean join) {
+        public Message(@Nonnull String player, boolean join) {
             user = player;
             type = join ? MessageType.JOIN : MessageType.QUIT;
             message = null;
         }
 
-        public void setFormattedMessage(@NotNull JsonMessage newMessage) {
+        public void setFormattedMessage(@Nonnull ITextComponent newMessage) {
             formattedMessage = newMessage;
         }
 
-        public @Nullable JsonMessage getMessage() {
+        public @Nullable ITextComponent getMessage() {
             return formattedMessage;
         }
         
@@ -78,11 +79,11 @@ public class IRC2Minestom {
             return message;
         }
 
-        public @NotNull String getUser() {
+        public @Nonnull String getUser() {
             return user;
         }
 
-        public @NotNull MessageType getType() {
+        public @Nonnull MessageType getType() {
             return type;
         }
     }
@@ -94,12 +95,18 @@ public class IRC2Minestom {
         public void process(final Message msg);
     }
 
+    private final MinecraftServer server;
+
+    public IRC2Minestom(MinecraftServer mcServer) {
+        server = mcServer;
+    }
+
     private Set<Preprocessor> earliestProcessors = new HashSet<>();
     private Set<Preprocessor> earlyProcessors = new HashSet<>();
     private Set<Processor> mediumProcessors = new HashSet<>();
     private Set<Processor> lateProcessors = new HashSet<>();
 
-    public void registerProcessor (@NotNull MessageProcessingStage stage, @NotNull Processor processor) {
+    public void registerProcessor (@Nonnull MessageProcessingStage stage, @Nonnull Processor processor) {
         switch (stage) {
         case PROCESS:
         case POST_PROCESS:
@@ -113,7 +120,7 @@ public class IRC2Minestom {
         }
     }
 
-    public void registerPreprocessor (@NotNull MessageProcessingStage stage, @NotNull Preprocessor processor) {
+    public void registerPreprocessor (@Nonnull MessageProcessingStage stage, @Nonnull Preprocessor processor) {
         switch (stage) {
         case PROCESS:
             earliestProcessors.add(processor);
@@ -134,20 +141,25 @@ public class IRC2Minestom {
         final Message msg = new Message(playername, preMSG.getMessage());
         mediumProcessors.forEach(proc -> proc.process(msg));
         lateProcessors.forEach(proc -> proc.process(msg));
-        MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
+        // TODO check which method we should actually use
+        server.getPlayerList().getPlayers().forEach(player -> player.sendStatusMessage(msg.getMessage(), false));
+//        server.getPlayerList().sendPacketToAllPlayers(new SChatPacket(msg.getMessage(), ChatType.CHAT, ));
+//        MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
     }
 
     public void issueJoin(String userName) {
         final Message msg = new Message(userName, true);
         mediumProcessors.forEach(proc -> proc.process(msg));
         lateProcessors.forEach(proc -> proc.process(msg));
-        MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
+        server.getPlayerList().getPlayers().forEach(player -> player.sendStatusMessage(msg.getMessage(), false));
+//        MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
     }
 
     public void issueQuit(String userName) {
         final Message msg = new Message(userName, false);
         mediumProcessors.forEach(proc -> proc.process(msg));
         lateProcessors.forEach(proc -> proc.process(msg));
-        MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
+        server.getPlayerList().getPlayers().forEach(player -> player.sendStatusMessage(msg.getMessage(), false));
+//        MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
     }
 }
