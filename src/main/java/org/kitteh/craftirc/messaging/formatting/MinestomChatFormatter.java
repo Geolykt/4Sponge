@@ -42,21 +42,21 @@ public class MinestomChatFormatter implements IRC2Minestom.Processor {
 
     @Override
     public void process(IRC2Minestom.Message msg) {
-        String legacyString;
+        String rawMessage;
         switch (msg.getType()) {
         case CHAT:
-            legacyString = chat.replaceAll("\\$\\{user}", msg.getUser()).replaceAll("\\$\\{msg}", msg.getOriginal());
+            rawMessage = chat.replaceAll("\\$\\{user}", msg.getUser()).replaceAll("\\$\\{msg}", msg.getOriginal());
             break;
         case JOIN:
-            legacyString = join.replaceAll("\\$\\{user}", msg.getUser());
+            rawMessage = join.replaceAll("\\$\\{user}", msg.getUser());
             break;
         case QUIT:
-            legacyString = quit.replaceAll("\\$\\{user}", msg.getUser());
+            rawMessage = quit.replaceAll("\\$\\{user}", msg.getUser());
             break;
         default:
             throw new IllegalArgumentException();
         }
-        msg.setFormattedMessage(ColoredText.ofLegacy(legacyString, 'f'));
+        msg.setFormattedMessage(ColoredText.of(rawMessage));
     }
 
 }
