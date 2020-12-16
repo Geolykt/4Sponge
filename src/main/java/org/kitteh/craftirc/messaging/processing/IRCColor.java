@@ -24,66 +24,12 @@
  */
 package org.kitteh.craftirc.messaging.processing;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.kitteh.irc.client.library.util.Format;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Converts IRC colors into MC colors
  */
 public final class IRCColor implements Preprocessor {
-
-    private static enum Matches {
-        BLACK(Format.BLACK, '0'),
-        DARK_BLUE(Format.DARK_BLUE, '1'),
-        DARK_GREEN(Format.DARK_GREEN, '2'),
-        DARK_AQUA(Format.TEAL, '3'),
-        DARK_RED(Format.BROWN, '4'),
-        DARK_PURPLE(Format.PURPLE, '5'),
-        GOLD(Format.OLIVE, '6'),
-        GRAY(Format.LIGHT_GRAY, '7'),
-        DARK_GRAY(Format.DARK_GRAY, '8'),
-        BLUE(Format.BLUE, '9'),
-        GREEN(Format.GREEN, 'A'),
-        AQUA(Format.CYAN, 'B'),
-        RED(Format.RED, 'C'),
-        LIGHT_PURPLE(Format.MAGENTA, 'D'),
-        YELLOW(Format.YELLOW, 'E'),
-        WHITE(Format.WHITE, 'F');
-
-        private Format irc;
-        private char mc;
-
-        Matches(Format irc, char mc) {
-            this.irc = irc;
-            this.mc = mc;
-        }
-
-        private static final Map<Integer, String> IRC_MAP;
-        private static final Pattern IRC_PATTERN = Pattern.compile(Format.COLOR_CHAR + "([0-9]{1,2})(?:,[0-9]{1,2})?");
-        private static final Map<Character, String> MC_MAP;
-        private static final Pattern MC_PATTERN = Pattern.compile("\u00A7([a-z0-9])", Pattern.CASE_INSENSITIVE);
-
-        static {
-            IRC_MAP = new HashMap<>();
-            MC_MAP = new HashMap<>();
-            for (Matches matches : values()) {
-                IRC_MAP.put(matches.irc.getColorChar(), "\u00A7" + matches.mc);
-                MC_MAP.put(matches.mc, matches.irc.toString());
-            }
-        }
-
-        static String getIRCByMC(char mc) {
-            return MC_MAP.get(mc);
-        }
-
-        static String getMCByIRC(int irc) {
-            return IRC_MAP.get(irc);
-        }
-    }
 
     private final boolean toIRC;
 
@@ -100,54 +46,90 @@ public final class IRCColor implements Preprocessor {
         }
     }
 
+    public static final char IRC_COLOR_ESCAPE_SEQUENCE = 0x03; // Also known as ETX (End of text), often represented as ^C
+    public static final char MC_COLOR_ESCAPE_SEQUENCE = 0xA7; // Also known as the paragraph sign, often represented as §
+
+    // Using mIRC's specifications (https://www.mirc.com/colors.html)
+    public static final ImmutableMap<Character, String> MC_TO_IRC = new ImmutableMap.Builder<Character, String>()
+            .put('0', "1") // black
+            .put('1', "2") // dark blue
+            .put('2', "3") // dark green
+            .put('3', "10") // dark aqua/cyan
+            .put('4', "5") // dark red
+            .put('5', "6") // dark purple
+            .put('6', "7") // gold
+            .put('7', "15") // gray
+            .put('8', "14") // dark gray
+            .put('9', "12") // blue
+            .put('a', "9") // green
+            .put('b', "11") // aqua / cyan
+            .put('c', "4") // red
+            .put('d', "13") // light purple
+            .put('e', "8") // yellow
+            .put('f', "0") // white
+            .build();
+
+    public static final ImmutableMap<String, Character> IRC_TO_MC = new ImmutableMap.Builder<String, Character>()
+            .put("0", 'f') // white
+            .put("1", '0') // black
+            .put("2", '1') // dark blue
+            .put("3", '2') // dark green
+            .put("4", 'c') // red
+            .put("5", '4') // dark red
+            .put("6", '5') // dark purple
+            .put("7", '6') // gold
+            .put("8", 'e') // yellow
+            .put("9", 'a') // green
+            .put("10", '3') // dark aqua/cyan
+            .put("11", 'b') // aqua / cyan
+            .put("12", '9') // blue
+            .put("13", 'd') // light purple
+            .put("14", '8') // dark gray
+            .put("15", '7') // gray
+            .build();
+
     private static String toIRC(String input) {
-        Matcher matcher = Matches.MC_PATTERN.matcher(input);
-        int currentIndex = 0;
-        StringBuilder builder = new StringBuilder();
-        while (matcher.find()) {
-            int next = matcher.start();
-            if (currentIndex < next) {
-                builder.append(input.substring(currentIndex, next));
-            }
-            currentIndex = matcher.end();
-            char s = matcher.group(1).toUpperCase().charAt(0);
-            if (s <= 'F') {
-                builder.append(Matches.getIRCByMC(s));
-            } else if (s == 'R') {
-                builder.append(Format.RESET);
+        // TODO bold, underline, etc.
+        char[] original = input.toCharArray();
+        StringBuilder out = new StringBuilder(original.length);
+        for (int i = 0; i < original.length; i++) {
+            char current = original[i];
+            if ((current == '&' || current == MC_COLOR_ESCAPE_SEQUENCE) && (i + 1) < original.length) {
+                String str = MC_TO_IRC.get(Character.toLowerCase(original[i + 1]));
+                if (str == null) {
+                    out.append(current);
+                } else {
+                    out.append(IRC_COLOR_ESCAPE_SEQUENCE);
+                    out.append(str);
+                    i++;
+                }
+            } else {
+                out.append(current);
             }
         }
-        if (currentIndex < input.length()) {
-            builder.append(input.substring(currentIndex));
-        }
-        return builder.append(Format.RESET).toString();
+        return out.toString();
     }
 
     private static String toMC(String input) {
-        input = input.replace(Format.BOLD.toString(), "");
-        input = input.replace(Format.UNDERLINE.toString(), "");
-        input = input.replace(Format.REVERSE.toString(), "");
-        input = input.replace(Format.RESET.toString(), "\u00A7r");
-        Matcher matcher = Matches.IRC_PATTERN.matcher(input);
-        int currentIndex = 0;
-        StringBuilder builder = new StringBuilder();
-        while (matcher.find()) {
-            int next = matcher.start();
-            if (currentIndex < next) {
-                builder.append(input.substring(currentIndex, next));
+        // TODO bold, underline, etc.
+        char[] original = input.toCharArray();
+        StringBuilder out = new StringBuilder(original.length);
+        for (int i = 0; i < original.length; i++) {
+            if (original[i] == IRC_COLOR_ESCAPE_SEQUENCE) {
+                if ((i + 2) >= original.length) {
+                    break;
+                }
+                if (Character.isDigit(original[i + 2])) {
+                    out.append(MC_COLOR_ESCAPE_SEQUENCE);
+                    out.append(IRC_TO_MC.getOrDefault(original[++i] + original[++i], 'r')); // TODO check char concentration
+                } else {
+                    out.append(MC_COLOR_ESCAPE_SEQUENCE);
+                    out.append(IRC_TO_MC.getOrDefault(String.valueOf(original[++i]), 'r'));
+                }
+            } else {
+                out.append(original[i]);
             }
-            currentIndex = matcher.end();
-            int i;
-            try {
-                i = Integer.parseInt(matcher.group(1));
-            } catch (NumberFormatException ignored) {
-                continue;
-            }
-            builder.append(Matches.getMCByIRC(i)); // TODO HEX Colors!
         }
-        if (currentIndex < input.length()) {
-            builder.append(input.substring(currentIndex));
-        }
-        return builder.append("\u00A7r").toString();
+        return out.toString();
     }
 }
