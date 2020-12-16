@@ -1,14 +1,18 @@
-CraftIRC Minestom 5
+CraftIRC - Minestom 5
 ===================
 
-This is still not in a stable-ish format --- usage at your own risk!
+CraftIRC - Minestom 5 (sometimes referred to MinestomIRC) is the first Minestom-IRC bridge.
+It is a direct port of CraftIRC 4 for sponge, however was later drastically changed so now most
+of the code is no longer inherited of CraftIRC 4. The changes allow easier maintainance for me
+as well as a reduced codebase size and a (in my opinion) better configuration.
+
+Screenshots:
+![Demonstraction of the extension with a view of the IRC client.](https://geolykt.de/img/minestomIRC-irc1.png)
+![Demonstraction of the extension with a view of the Minecraft client.](https://geolykt.de/img/minestomIRC-mc1.png)
 
 ---
 
-A fork of the "CraftIRC 4 - Sponge" project but instead of Sponge Minestom support is the goal.
-CraftIRC Minestom 5 however has drastic changes compared to version 4 to allow
-for easier maintainance and usage on my side of things. As well as a massively reduced amount
-of lines of code.
+In case that you need help with anything here, feel free to create an issue on Github.
 
 ------------------------------
 

@@ -29,13 +29,15 @@ bots:
       mc-quit: true
     format:
       # Format seen in Minecraft when a user joined in IRC
-      mc-join: "*IRC ${user} joined."
-      mc-quit: "*IRC ${user} left."
-      mc-chat: "*IRC <${user}>: ${msg}"
+      # Note: We are using Minestom-style color codes, bukkit-plugin-style color codes (like "&4") aren't going to work
+      mc-join: "{#dark_red}*{#red}IRC {#yellow}${user} joined."
+      mc-quit: "{#dark_red}*{#red}IRC {#yellow}${user} left."
+      mc-chat: "{#dark_red}*{#red}IRC {#white}<${user}>: ${msg}"
       # Format seen in IRC when a player joined in Minecraft
-      irc-join: "${user} joined."
-      irc-quit: "${user} left."
-      irc-chat: "${user}: ${msg}"
+      # Note: the color codes are in mIRC's specification (https://www.mirc.com/colors.html)
+      irc-join: "\u00037${user} joined."
+      irc-quit: "\u00037${user} left."
+      irc-chat: "\u00037${user}:\u0003 ${msg}"
     processors:
       colors-irc: true # Converts MC/Minestom colors into IRC Colors
       colors-mc: true # Converts IRC colors into Minestom colors.

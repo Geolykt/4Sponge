@@ -5,6 +5,7 @@
 # To ignore the opinions of others, cover your ears and scream "LA LA LA!"
 
 # Maven makes this!
-/target
-/.classpath
-/.project
+target
+.classpath
+.project
+dependency-reduced-pom.xml
