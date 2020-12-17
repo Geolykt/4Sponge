@@ -29,6 +29,7 @@ public class ForgeIRCConfig {
         confBuilder.pop();
 
         confBuilder.comment("The username that should bot should have").define("user", "CraftIRC");
+        confBuilder.comment("The real name that the bot should use").define("realname", "CraftIRC/MinestomIRC Bot");
         confBuilder.comment("The nick the bot should have").define("nick", "ForgeIRC");
 
         confBuilder.comment("Authentification settings for the bot").push("auth");

@@ -35,8 +35,11 @@ import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.Client.Builder.Server.SecurityType;
 import org.kitteh.irc.client.library.feature.auth.NickServ;
 
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.HashSet;
@@ -101,33 +104,35 @@ public final class BotManager {
         }
     }
 
-    private void addBot(@Nonnull String name, @Nonnull ForgeConfigSpec conf, @Nonnull MinecraftServer mcServer) {
+    @SuppressWarnings("unchecked")
+    private void addBot(@Nonnull String name, @Nonnull ForgeConfigSpec config, @Nonnull MinecraftServer mcServer) {
         Client.Builder botBuilder = Client.builder();
         botBuilder.name(name);
-        botBuilder.server().host(conf.getRaw("forgeirc.bots." + name + ".host"));
-        SecurityType security = (boolean) conf.get("forgeirc.bots." + name + ".ssl") ? SecurityType.SECURE : SecurityType.INSECURE;
-        botBuilder.server().port(conf.getShort("forgeirc.bots." + name + ".port"), security);
-        botBuilder.server().password(conf.get("forgeirc.bots." + name + ".password"));
-        botBuilder.user(conf.get("forgeirc.bots." + name + ".user"));
-        botBuilder.realName(conf.get("forgeirc.bots." + name + ".realname"));
-        botBuilder.nick(conf.get("forgeirc.bots." + name + ".nick"));
+        UnmodifiableConfig conf = config.getValues();
+        botBuilder.server().host(((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".host")).get());
+        SecurityType security = ((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".ssl")).get() ? SecurityType.SECURE : SecurityType.INSECURE;
+        botBuilder.server().port((int) ((ConfigValue<Number>)conf.get("forgeirc.bots." + name + ".port")).get(), security);
+        botBuilder.server().password(((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".password")).get());
+        botBuilder.user(((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".user")).get());
+        botBuilder.realName(((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".realname")).get());
+        botBuilder.nick(((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".nick")).get());
 
-        botBuilder.bind().host(conf.get("forgeirc.bots." + name + ".bind.host"));
-        botBuilder.bind().port(conf.getShort("forgeirc.bots." + name + ".bind.port"));
+        botBuilder.bind().host(((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".bind.host")).get());
+        botBuilder.bind().port((int) ((ConfigValue<Number>)conf.get("forgeirc.bots." + name + ".bind.port")).get());
 
-        String authUser = conf.get("forgeirc.bots." + name + ".auth.user");
-        String authPass = conf.get("forgeirc.bots." + name + ".auth.pass");
-        boolean nickless = conf.get("forgeirc.bots." + name + ".auth.nickless");
+        String authUser = ((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".auth.user")).get();
+        String authPass = ((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".auth.pass")).get();
+        boolean nickless = ((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".auth.nickless")).get();
 
-        if ((boolean) conf.get("forgeirc.bots." + name + ".debug-output.exceptions")) {
+        if (((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".debug-output.exceptions")).get()) {
             botBuilder.listeners().exception(exception -> CraftIRC.log().warn("Exception on bot " + name, exception));
         } else {
             botBuilder.listeners().exception(null);
         }
-        if ((boolean) conf.get("forgeirc.bots." + name + ".debug-output.input")) {
+        if (((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".debug-output.input")).get()) {
             botBuilder.listeners().input(input -> CraftIRC.log().info("[IN] " + input));
         }
-        if ((boolean) conf.get("forgeirc.bots." + name + ".debug-output.output")) {
+        if (((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".debug-output.output")).get()) {
             botBuilder.listeners().output(output -> CraftIRC.log().info("[OUT] " + output));
         }
 
@@ -142,44 +147,44 @@ public final class BotManager {
         final IRCBot bot = new IRCBot(name, newBot, mcServer);
 
         // register IRC events
-        if ((boolean) conf.get("forgeirc.bots." + name + ".event.irc-chat")) {
+        if (((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".event.irc-chat")).get()) {
             bot.getClient().getEventManager().registerEventListener(new IRCEventListener(bot.getToMinestom()));
         }
 
         // register minecraft events
         ForgeEventListener mcEvents = new ForgeEventListener(bot.getToIRC());
-        if ((boolean) conf.get("forgeirc.bots." + name + ".event.mc-chat")) {
+        if (((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".event.mc-chat")).get()) {
             MinecraftForge.EVENT_BUS.addListener(mcEvents::onPlayerChat);
         }
-        if ((boolean) conf.get("forgeirc.bots." + name + ".event.mc-join")) {
+        if (((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".event.mc-join")).get()) {
             MinecraftForge.EVENT_BUS.addListener(mcEvents::onPlayerJoin);
         }
-        if ((boolean) conf.get("forgeirc.bots." + name + ".event.mc-quit")) {
+        if (((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".event.mc-quit")).get()) {
             MinecraftForge.EVENT_BUS.addListener(mcEvents::onPlayerLeave);
         }
 
         // register formatters
         bot.getToIRC().registerProcessor(MessageProcessingStage.FORMAT, 
                 new IRCChatFormatter(
-                        conf.get("forgeirc.bots." + name + ".format.irc-chat"),
-                        conf.get("forgeirc.bots." + name + ".format.irc-join"),
-                        conf.get("forgeirc.bots." + name + ".format.irc-quit")));
+                        ((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".format.irc-chat")).get(),
+                        ((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".format.irc-join")).get(),
+                        ((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".format.irc-quit")).get()));
         bot.getToMinestom().registerProcessor(MessageProcessingStage.FORMAT, 
                 new MinestomChatFormatter(
-                        conf.get("forgeirc.bots." + name + ".format.mc-chat"),
-                        conf.get("forgeirc.bots." + name + ".format.mc-join"),
-                        conf.get("forgeirc.bots." + name + ".format.mc-quit")));
+                        ((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".format.mc-chat")).get(),
+                        ((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".format.mc-join")).get(),
+                        ((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".format.mc-quit")).get()));
 
         // register preprocessors
-        if ((boolean) conf.get("forgeirc.bots." + name + ".processors.colors-irc")) {
+        if (((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".processors.colors-irc")).get()) {
             bot.getToIRC().registerPreprocessor(MessageProcessingStage.PROCESS, new IRCColor(true));
         }
-        if ((boolean) conf.get("forgeirc.bots." + name + ".processors.colors-mc")) {
+        if (((ConfigValue<Boolean>)conf.get("forgeirc.bots." + name + ".processors.colors-mc")).get()) {
             bot.getToMinestom().registerPreprocessor(MessageProcessingStage.PROCESS, new IRCColor(false));
         }
 
         // Add bot to channel
-        bot.addChannel(conf.get("forgeirc.bots." + name + ".channel"));
+        bot.addChannel(((ConfigValue<String>)conf.get("forgeirc.bots." + name + ".channel")).get());
 
         // register bot
         this.bots.put(name, bot);
