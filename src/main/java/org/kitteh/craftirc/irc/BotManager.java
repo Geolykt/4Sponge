@@ -60,8 +60,8 @@ public final class BotManager {
      *
      * @param bots list of bot data to load
      */
-    public BotManager(@Nonnull List<? extends ConfigurationNode> bots) {
-        this.loadBots(bots);
+    public BotManager(@Nonnull List<? extends ConfigurationNode> bots, MinecraftServer server) {
+        this.loadBots(bots, server);
     }
 
     public void shutdown() {
