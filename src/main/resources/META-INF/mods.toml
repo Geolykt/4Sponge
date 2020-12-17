@@ -34,8 +34,7 @@ displayName="ForgeIRC" #mandatory
 # A text field displayed in the mod UI
 authors="Mbaxter, Geolykt" #optional
 # The description text for the mod (multi line!) (#mandatory)
-description=
-'''
+description='''
 ForgeIRC - A Forge - IRC Bridge
 
 ForgeIRC is a reimplementation of MinestomIRC, which is a fork of CraftIRC 4Sponge, which is a reimplementation of CraftIRC 4.

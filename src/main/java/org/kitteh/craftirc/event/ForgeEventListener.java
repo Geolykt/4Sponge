@@ -30,11 +30,11 @@ import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 
-public final class MinestomEventListener {
+public final class ForgeEventListener {
 
     private final Minestom2IRC reportingInstance;
 
-    public MinestomEventListener(Minestom2IRC m2irc) {
+    public ForgeEventListener(Minestom2IRC m2irc) {
         reportingInstance = m2irc;
     }
 
