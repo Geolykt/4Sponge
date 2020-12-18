@@ -51,9 +51,9 @@ public class ForgeIRCConfig {
             .define("mc-join", "\u00A74*\u00A7cIRC \u00A7e ${user} joined the IRC.");
         confBuilder.comment("Format of IRC Chat broadcasted to the minecraft server")
             .define("mc-quit", "\u00A74*\u00A7cIRC \u00A7e ${user} left the IRC.");
-        confBuilder.comment("Format of Minecraft joins broadcasted to IRC.").define("irc-join", "\u00037 {$user} joined.");
-        confBuilder.comment("Format of Minecraft disconnections broadcasted to IRC.").define("irc-quit", "\u00037 {$user} left.");
-        confBuilder.comment("Format of Minecraft chatter broadcasted to IRC.").define("irc-chat", "\u00037 {$user}: \u0003 ${msg}");
+        confBuilder.comment("Format of Minecraft joins broadcasted to IRC.").define("irc-join", "\u00037 ${user} joined.");
+        confBuilder.comment("Format of Minecraft disconnections broadcasted to IRC.").define("irc-quit", "\u00037 ${user} left.");
+        confBuilder.comment("Format of Minecraft chatter broadcasted to IRC.").define("irc-chat", "\u00037 ${user}: \u0003 ${msg}");
         confBuilder.pop();
 
         confBuilder.comment("Events that should be listened to").push("event");

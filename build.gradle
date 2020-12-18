@@ -14,8 +14,8 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = '5.0.0'
-group = 'de.geolykt.forgeirc' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+version = '1.16.4-5.0.0'
+group = 'de.geolykt.forgeirc'
 archivesBaseName = 'forgeirc'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
@@ -76,7 +76,6 @@ shadowJar {
     from sourceSets.main.allSource
 
     relocate 'net.engio', 'bork.engio'
-    relocate 'org.yaml', 'bork.yaml'
     relocate 'io.leangen', 'bork.leangen'
     relocate 'org.checkerframework', 'bork.checkerframework'
 }
@@ -90,7 +89,7 @@ jar {
         attributes([
             "Specification-Title": "MinestomIRC", // Minestom IRC provides most of the software specification ForgeIRC uses
             "Specification-Vendor": "Geolykt",
-            "Specification-Version": "5",
+            "Specification-Version": "5", // Minestom IRC is currently at v5.0.0
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"Geolykt",
