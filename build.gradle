@@ -24,31 +24,6 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 
 minecraft {
     mappings channel: 'snapshot', version: '20201028-1.16.3'
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-
-    runs {
-        client {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                forgeirc {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                forgeirc {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
 }
 
 configurations {
@@ -73,7 +48,6 @@ dependencies {
 
 shadowJar {
     configurations = [project.configurations.shade]
-    from sourceSets.main.allSource
 
     relocate 'net.engio', 'bork.engio'
     relocate 'io.leangen', 'bork.leangen'
