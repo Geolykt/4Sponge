@@ -72,6 +72,13 @@ jar {
     }
 }
 
+processResources {
+    filesMatching('**/mods.toml') {
+        filter {
+            it.replace('${version}', version)
+        }
+    }
+}
 
 tasks.build.dependsOn reobfShadowJar
 publish.dependsOn('reobfJar')
