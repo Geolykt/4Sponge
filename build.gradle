@@ -14,7 +14,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = '1.16.4-5.0.0'
+version = '1.15.2-5.0.0'
 group = 'de.geolykt.forgeirc'
 archivesBaseName = 'forgeirc'
 
@@ -23,7 +23,7 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
-    mappings channel: 'snapshot', version: '20201028-1.16.3'
+    mappings channel: 'snapshot', version: '20200514-1.15.1'
 }
 
 configurations {
@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.4-35.1.13'
+    minecraft 'net.minecraftforge:forge:1.15.2-31.2.47'
 
     compile 'org.kitteh.irc:client-lib:7.3.0'
 

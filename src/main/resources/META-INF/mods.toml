@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[35,)"
+loaderVersion="[31,)"
 license="MIT (Expat) License"
 issueTrackerURL="https://github.com/Geolykt/CraftIRC/issues"
 [[mods]]
@@ -22,12 +22,12 @@ ForgeIRC is a reimplementation of MinestomIRC, which is a fork of CraftIRC 4Spon
 [[dependencies.forgeirc]]
     modId="forge"
     mandatory=true
-    versionRange="[35,)"
+    versionRange="[31,)"
     ordering="NONE"
     side="SERVER"
 [[dependencies.forgeirc]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.4,1.17)"
+    versionRange="[1.15.2]"
     ordering="NONE"
     side="SERVER"

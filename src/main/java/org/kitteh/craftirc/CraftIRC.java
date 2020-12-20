@@ -28,7 +28,6 @@ import net.minecraft.command.Commands;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -68,12 +67,8 @@ public final class CraftIRC {
     private final ForgeIRCCommand cmd = new ForgeIRCCommand("5.0.0"); // TODO externalise version
 
     @SubscribeEvent
-    public void setup(final RegisterCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("forgeirc").executes(cmd));
-    }
-
-    @SubscribeEvent
     public void setup(final FMLServerStartingEvent event) {
+        event.getCommandDispatcher().register(Commands.literal("forgeirc").executes(cmd));
         startMeUp(event.getServer());
     }
 
