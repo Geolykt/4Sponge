@@ -24,9 +24,33 @@
  */
 package org.kitteh.craftirc.messaging;
 
+/**
+ * Presents the different reasons why a message was created
+ * @since 5.0.0
+ */
 public enum MessageType {
 
+    /**
+     * The message was created because a player joined the channel
+     * @since 5.0.0
+     */
     JOIN,
+
+    /**
+     * The message was created as the player parted from the channel
+     * @since 5.0.0
+     */
     QUIT,
-    CHAT;
+
+    /**
+     * The message was created as a chat message was sent
+     * @since 5.0.0
+     */
+    CHAT,
+
+    /**
+     * The message was created as the user was kicked.
+     * @since 5.0.1
+     */
+    KICK;
 }

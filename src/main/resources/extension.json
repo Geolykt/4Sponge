@@ -1,7 +1,7 @@
 {
   "entrypoint": "org.kitteh.craftirc.CraftIRC",
   "name": "CraftIRC",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "authors": ["mbaxter", "geolykt"],
   "externalDependencies": {
     "repositories": [

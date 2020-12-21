@@ -165,9 +165,11 @@ public final class BotManager {
         ConfigurationNode processors = data.node("processors");
 
         // register IRC events
-        if (events.node("irc-chat").getBoolean()) {
-            bot.getClient().getEventManager().registerEventListener(new IRCEventListener(bot.getToMinestom()));
-        }
+        bot.getClient().getEventManager().registerEventListener(new IRCEventListener(bot.getToMinestom(), 
+                events.node("irc-chat").getBoolean(),
+                events.node("irc-join").getBoolean(),
+                events.node("irc-quit").getBoolean(),
+                events.node("irc-kick").getBoolean()));
 
         // register minecraft events
         MinestomEventListener mcEvents = new MinestomEventListener(bot.getToIRC());
@@ -195,7 +197,8 @@ public final class BotManager {
         bot.getToMinestom().registerProcessor(MessageProcessingStage.FORMAT, 
                 new MinestomChatFormatter(format.node("mc-chat").getString(), 
                         format.node("mc-join").getString(), 
-                        format.node("mc-quit").getString()));
+                        format.node("mc-quit").getString(),
+                        format.node("mc-kick").getString(format.node("mc-quit").getString())));
 
         // register preprocessors
         if (processors.node("colors-irc").getBoolean()) {

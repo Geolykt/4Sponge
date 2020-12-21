@@ -28,6 +28,7 @@ import org.kitteh.craftirc.messaging.Minestom2IRC;
 
 /**
  * The IRC Chat Formatter is a nice formatter that formats messages sent to the IRC.
+ * @since 5.0.0
  */
 public class IRCChatFormatter implements Minestom2IRC.Processor {
 
@@ -35,10 +36,17 @@ public class IRCChatFormatter implements Minestom2IRC.Processor {
     private final String join;
     private final String quit;
 
-    public IRCChatFormatter(String usingFormatChat, String usingFormatJoin, String usingFormatLeave) {
+    /**
+     * Creates a new IRCChatFormatter with the given messages.
+     * @param usingFormatChat The format of the chat messages
+     * @param usingFormatJoin The format of the join messages
+     * @param usingFormatDisconnect The format of the disconnect messages
+     * @since 5.0.0
+     */
+    public IRCChatFormatter(String usingFormatChat, String usingFormatJoin, String usingFormatDisconnect) {
         chat = usingFormatChat;
         join = usingFormatJoin;
-        quit = usingFormatLeave;
+        quit = usingFormatDisconnect;
     }
 
     @Override
@@ -50,8 +58,9 @@ public class IRCChatFormatter implements Minestom2IRC.Processor {
         case JOIN:
             msg.setFormattedMessage(join.replaceAll("\\$\\{user}", msg.getUser()));
             break;
+        case KICK:
         case QUIT:
-            msg.setFormattedMessage(quit.replaceAll("\\$\\{user}", msg.getUser()));
+            msg.setFormattedMessage(quit.replaceAll("\\$\\{user}", msg.getUser()).replaceAll("\\$\\{msg}", msg.getMessage()));
             break;
         default:
             throw new IllegalArgumentException();

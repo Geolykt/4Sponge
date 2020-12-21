@@ -6,7 +6,7 @@
     <artifactId>craftirc-minestom</artifactId>
 
     <name>CraftIRC 4Minestom</name>
-    <version>5.0.0</version>
+    <version>5.0.1</version>
 
     <!-- <url>http://kitteh.org/</url> -->
 
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.github.Minestom</groupId>
             <artifactId>Minestom</artifactId>
-            <version>ed46bd0dc2</version>
+            <version>460813b6e0</version>
             <scope>provided</scope>
             <!-- something that bricks maven ... -->
             <exclusions>

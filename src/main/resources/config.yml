@@ -21,9 +21,20 @@ bots:
       input: false
       output: false
     event:
-      irc-join: true # unused
-      irc-quit: true # unused
+      # IRC Joins
+      irc-join: true
+      # Called when a user parts an IRC channel
+      irc-quit: true
+      # Called when a user is kicked from an IRC channel
+      irc-kick: true
+      # IRC Chatter
       irc-chat: true
+      # (NOT IMPLEMENTED) Called when a user is marked as being away (usually performed via the /away command)
+      irc-away: true
+      # (NOT IMPLEMENTED) Prints the (minecraft) world time when the ctcp TIME command is sent to the bot
+      irc-ctcp-time: true
+
+      # Minecraft chatter
       mc-chat: true
       mc-join: true
       mc-quit: true
@@ -31,8 +42,10 @@ bots:
       # Format seen in Minecraft when a user joined in IRC
       # Note: We are using Minestom-style color codes, bukkit-plugin-style color codes (like "&4") aren't going to work
       mc-join: "{#dark_red}*{#red}IRC {#yellow}${user} joined."
-      mc-quit: "{#dark_red}*{#red}IRC {#yellow}${user} left."
+      mc-quit: "{#dark_red}*{#red}IRC {#yellow}${user} left (${msg})." # called when a user parts the IRC channel
+      mc-kick: "{#dark_red}*{#red}IRC {#yellow}${user} was kicked (${msg})."
       mc-chat: "{#dark_red}*{#red}IRC {#white}<${user}>: ${msg}"
+      mc-away: "{#dark_red}*{#red}IRC {#yellow}${user} is now away (${msg})."
       # Format seen in IRC when a player joined in Minecraft
       # Note: the color codes are in mIRC's specification (https://www.mirc.com/colors.html)
       irc-join: "\u00037${user} joined."

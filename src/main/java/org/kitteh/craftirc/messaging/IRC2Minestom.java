@@ -27,6 +27,7 @@ package org.kitteh.craftirc.messaging;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kitteh.craftirc.messaging.processing.MessageProcessingStage;
@@ -41,6 +42,7 @@ public class IRC2Minestom {
     /**
      * Represents a message that can be sent to Minestom that should usually originate from
      * IRC.
+     * @since 5.0.0
      */
     public static class Message {
 
@@ -57,13 +59,27 @@ public class IRC2Minestom {
 
         /**
          * Creates a JOIN/QUIT message
-         * @param player The affected user
+         * @param nick The affected user
          * @param join True to indicate join, false to indicate quit
+         * @since 5.0.0
          */
-        public Message(@NotNull String player, boolean join) {
-            user = player;
+        public Message(@NotNull String nick, boolean join) {
+            user = nick;
             type = join ? MessageType.JOIN : MessageType.QUIT;
-            message = null;
+            message = join ? null : "Quit";
+        }
+
+        /**
+         * Creates a KICK/PART message with a reason message.
+         * @param nick The user
+         * @param kick True if this was a kick, false if it was a parting
+         * @param reason The reason of the kick or part
+         * @since 5.0.1
+         */
+        public Message(@NonNull String nick, boolean kick, @NonNull String reason) {
+            user = nick;
+            type = kick ? MessageType.KICK : MessageType.QUIT;
+            message = reason;
         }
 
         public void setFormattedMessage(@NotNull JsonMessage newMessage) {
@@ -89,6 +105,7 @@ public class IRC2Minestom {
 
     /**
      * Abstract interface that can be used to manipulate the contents of the Message
+     * @since 5.0.0
      */
     public static interface Processor {
         public void process(final Message msg);
@@ -144,8 +161,25 @@ public class IRC2Minestom {
         MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
     }
 
+    @Deprecated(since = "5.0.1", forRemoval = true)
     public void issueQuit(String userName) {
-        final Message msg = new Message(userName, false);
+        try {
+            issueQuit(userName, "Quit", false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Issues and processes a quit or kick message. The quit message applies both parting (channelwide) and quits (networkwide)
+     * @param nick The nick of the user that performed the operation
+     * @param message The given reason of why this happened. Often it is given by the client to state it's intentions.
+     * @param isKick True if the disconnection happened due to a kick, false if it was due to other reasons (part or quit).
+     * @throws Exception Any exception that happened during the processing phase
+     * @since 5.0.1
+     */
+    public void issueQuit(@NonNull String nick, @NonNull String message, boolean isKick) throws Exception {
+        final Message msg = new Message(nick, isKick, message);
         mediumProcessors.forEach(proc -> proc.process(msg));
         lateProcessors.forEach(proc -> proc.process(msg));
         MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
