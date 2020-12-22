@@ -29,7 +29,7 @@ bots:
       irc-kick: true
       # IRC Chatter
       irc-chat: true
-      # (NOT IMPLEMENTED) Called when a user is marked as being away (usually performed via the /away command)
+      # (NOT FUNCTIONAL, don't ask why) Called when a user is marked as being away (usually performed via the /away command)
       irc-away: true
       # (NOT IMPLEMENTED) Prints the (minecraft) world time when the ctcp TIME command is sent to the bot
       irc-ctcp-time: true
@@ -45,7 +45,9 @@ bots:
       mc-quit: "{#dark_red}*{#red}IRC {#yellow}${user} left (${msg})." # called when a user parts the IRC channel
       mc-kick: "{#dark_red}*{#red}IRC {#yellow}${user} was kicked (${msg})."
       mc-chat: "{#dark_red}*{#red}IRC {#white}<${user}>: ${msg}"
-      mc-away: "{#dark_red}*{#red}IRC {#yellow}${user} is now away (${msg})."
+      mc-away: "{#dark_red}*{#red}IRC {#yellow}${user} is now away."
+      mc-back: "{#dark_red}*{#red}IRC {#yellow}${user} is no longer away." # called when a user is no longer marked to be away
+
       # Format seen in IRC when a player joined in Minecraft
       # Note: the color codes are in mIRC's specification (https://www.mirc.com/colors.html)
       irc-join: "\u00037${user} joined."

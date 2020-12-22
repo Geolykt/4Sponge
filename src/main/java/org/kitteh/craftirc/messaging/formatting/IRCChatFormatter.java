@@ -56,10 +56,12 @@ public class IRCChatFormatter implements Minestom2IRC.Processor {
             msg.setFormattedMessage(chat.replaceAll("\\$\\{user}", msg.getUser()).replaceAll("\\$\\{msg}", msg.getMessage()));
             break;
         case JOIN:
+        case BACK:
             msg.setFormattedMessage(join.replaceAll("\\$\\{user}", msg.getUser()));
             break;
         case KICK:
         case QUIT:
+        case AWAY:
             msg.setFormattedMessage(quit.replaceAll("\\$\\{user}", msg.getUser()).replaceAll("\\$\\{msg}", msg.getMessage()));
             break;
         default:

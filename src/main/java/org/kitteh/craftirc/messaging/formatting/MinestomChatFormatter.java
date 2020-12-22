@@ -40,25 +40,33 @@ public class MinestomChatFormatter implements IRC2Minestom.Processor {
     private final String join;
     private final String quit;
     private final String kick;
+    private final String away;
+    private final String back;
 
     /**
      * Creates a new MinestomChatFormatter with the given messages.
      * @param usingFormatChat The format of the chat messages
      * @param usingFormatJoin The format of the join messages
      * @param usingFormatPart The format of the parting messages
-     * @param usingFormatKick The format of the messages where a player was kicked.
+     * @param usingFormatKick The format of the messages where a user was kicked.
+     * @param usingFormatAway The format of the message when a user is marked to be away
+     * @param usingFormatBack The format of the message when a user is no longer marked to be away
      * @since 5.0.1
      */
     public MinestomChatFormatter(@NotNull String usingFormatChat, @NotNull String usingFormatJoin, 
-            @NotNull String usingFormatPart, @NotNull String usingFormatKick) {
+            @NotNull String usingFormatPart, @NotNull String usingFormatKick, @NotNull String usingFormatAway,
+            @NotNull String usingFormatBack) {
         chat = usingFormatChat;
         join = usingFormatJoin;
         quit = usingFormatPart;
         kick = usingFormatKick;
+        away = usingFormatAway;
+        back = usingFormatBack;
     }
 
     /**
-     * Creates a new MinestomChatFormatter with the given messages. The kick message will be the same as the part message
+     * Creates a new MinestomChatFormatter with the given messages. The kick message will be the same as the part message.
+     * The away message will also be the same as the parting message
      * @param usingFormatChat The format of the chat messages
      * @param usingFormatJoin The format of the join messages
      * @param usingFormatPart The format of the kick and parting messages
@@ -66,7 +74,7 @@ public class MinestomChatFormatter implements IRC2Minestom.Processor {
      */
     @Deprecated(forRemoval = true, since = "5.0.1")
     public MinestomChatFormatter(String usingFormatChat, String usingFormatJoin, String usingFormatPart) {
-        this(usingFormatChat, usingFormatJoin, usingFormatPart, usingFormatPart);
+        this(usingFormatChat, usingFormatJoin, usingFormatPart, usingFormatPart, usingFormatPart, usingFormatJoin);
     }
 
     @Override
@@ -84,6 +92,13 @@ public class MinestomChatFormatter implements IRC2Minestom.Processor {
             break;
         case KICK:
             rawMessage = kick.replaceAll("\\$\\{user}", msg.getUser()).replaceAll("\\$\\{msg}", msg.getOriginal());
+            break;
+        case AWAY:
+            rawMessage = away.replaceAll("\\$\\{user}", msg.getUser()).replaceAll("\\$\\{msg}", msg.getOriginal());
+            break;
+        case BACK:
+            rawMessage = back.replaceAll("\\$\\{user}", msg.getUser()).replaceAll("\\$\\{msg}", msg.getOriginal());
+            break;
         default:
             throw new IllegalArgumentException();
         }

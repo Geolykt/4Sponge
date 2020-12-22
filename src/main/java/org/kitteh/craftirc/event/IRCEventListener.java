@@ -30,6 +30,7 @@ import org.kitteh.irc.client.library.event.channel.ChannelJoinEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelKickEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.event.channel.ChannelPartEvent;
+import org.kitteh.irc.client.library.event.client.ClientAwayStatusChangeEvent;
 import org.kitteh.irc.client.library.event.user.UserQuitEvent;
 
 import net.engio.mbassy.listener.Handler;
@@ -38,7 +39,7 @@ import net.engio.mbassy.listener.Invoke;
 public class IRCEventListener {
 
     public IRC2Minestom handlingInstance;
-    protected final boolean handleChat, handleJoins, handleQuits, handleKicks;
+    protected final boolean handleChat, handleJoins, handleQuits, handleKicks, handleAways;
 
     /**
      * Creates a new IRCEventListener that listens only for chat interactions
@@ -47,7 +48,7 @@ public class IRCEventListener {
      */
     @Deprecated(forRemoval = true, since = "5.0.1")
     public IRCEventListener(IRC2Minestom irc2m) {
-        this(irc2m, true, false, false, false);
+        this(irc2m, true, false, false, false, false);
     }
 
     /**
@@ -57,14 +58,16 @@ public class IRCEventListener {
      * @param join True if the listener should process channel joins
      * @param part True if the listener should process channel disconnects
      * @param kick True if the listener should process channel kicks
+     * @param away True if the listener should process when a user marks himself to be away
      * @since 5.0.1
      */
-    public IRCEventListener(IRC2Minestom irc2m, boolean chat, boolean join, boolean part, boolean kick) {
+    public IRCEventListener(IRC2Minestom irc2m, boolean chat, boolean join, boolean part, boolean kick, boolean away) {
         handlingInstance = irc2m;
         handleChat = chat;
         handleJoins = join;
         handleQuits = part;
         handleKicks = kick;
+        handleAways = away;
     }
 
     /**
@@ -154,12 +157,35 @@ public class IRCEventListener {
             return;
         }
         try {
-            handlingInstance.issueQuit(event.getActor().getName(), event.getMessage(), false);
+            handlingInstance.issueQuit(event.getActor().getNick(), event.getMessage(), false);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    // TODO implement away
+
+    /**
+     * @deprecated Does not appear to work
+     * Event handler for when a user marks himself to be away.
+     * It is recommended to perform this action asynchronously because why not?
+     * @param event The event to pass
+     * @since 5.0.1
+     */
+    @Deprecated(forRemoval = false, since = "5.0.1")
+    @Handler(delivery = Invoke.Asynchronously)
+    public void away(ClientAwayStatusChangeEvent event) {
+        if (!handleAways) {
+            return;
+        }
+        try {
+            if (event.isNowAway()) {
+                handlingInstance.issueAway(event.getClient().getNick());
+            } else {
+                handlingInstance.issueBack(event.getClient().getNick());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     // TODO implement Channel CTCP Event
 
 }

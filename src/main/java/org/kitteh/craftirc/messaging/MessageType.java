@@ -49,8 +49,20 @@ public enum MessageType {
     CHAT,
 
     /**
-     * The message was created as the user was kicked.
+     * The message was created as the user was kicked
      * @since 5.0.1
      */
-    KICK;
+    KICK,
+
+    /**
+     * The message was created as the user has marked itself as being away
+     * @since 5.0.1
+     */
+    AWAY, 
+
+    /**
+     * The message was created as the user returned from it's away state
+     * @since 5.0.1
+     */
+    BACK;
 }

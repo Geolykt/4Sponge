@@ -51,6 +51,27 @@ public class IRC2Minestom {
         protected final @NotNull MessageType type;
         protected @Nullable JsonMessage formattedMessage;
 
+        /**
+         * Constructs a message of the given type.
+         * @param sender The sender of the message
+         * @param content The content of the message
+         * @param msgType The type of the message
+         * @since 5.0.1
+         */
+        public Message(@NotNull String sender, @NotNull String content, @NotNull MessageType msgType) {
+            user = sender;
+            type = msgType;
+            message = content;
+        }
+
+        /**
+         * @deprecated This is constructor is ambiguous, use Message(String, String, MessageType) instead.
+         * Constructs a chat message with the given sender and content
+         * @param sender The name of the sender of the message
+         * @param content The content of the message, should exclude the username
+         * @since 5.0.0
+         */
+        @Deprecated(forRemoval = true, since = "5.0.1")
         public Message(@NotNull String sender, @NotNull String content) {
             user = sender;
             type = MessageType.CHAT;
@@ -67,19 +88,6 @@ public class IRC2Minestom {
             user = nick;
             type = join ? MessageType.JOIN : MessageType.QUIT;
             message = join ? null : "Quit";
-        }
-
-        /**
-         * Creates a KICK/PART message with a reason message.
-         * @param nick The user
-         * @param kick True if this was a kick, false if it was a parting
-         * @param reason The reason of the kick or part
-         * @since 5.0.1
-         */
-        public Message(@NonNull String nick, boolean kick, @NonNull String reason) {
-            user = nick;
-            type = kick ? MessageType.KICK : MessageType.QUIT;
-            message = reason;
         }
 
         public void setFormattedMessage(@NotNull JsonMessage newMessage) {
@@ -172,14 +180,38 @@ public class IRC2Minestom {
 
     /**
      * Issues and processes a quit or kick message. The quit message applies both parting (channelwide) and quits (networkwide)
-     * @param nick The nick of the user that performed the operation
+     * @param userName The name of the user that performed the operation
      * @param message The given reason of why this happened. Often it is given by the client to state it's intentions.
      * @param isKick True if the disconnection happened due to a kick, false if it was due to other reasons (part or quit).
      * @throws Exception Any exception that happened during the processing phase
      * @since 5.0.1
      */
-    public void issueQuit(@NonNull String nick, @NonNull String message, boolean isKick) throws Exception {
-        final Message msg = new Message(nick, isKick, message);
+    public void issueQuit(@NotNull String userName, @NotNull String message, boolean isKick) throws Exception {
+        final Message msg = new Message(userName, message, isKick ? MessageType.KICK : MessageType.QUIT);
+        mediumProcessors.forEach(proc -> proc.process(msg));
+        lateProcessors.forEach(proc -> proc.process(msg));
+        MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
+    }
+
+    /**
+     * Issues and processes an away message. May not handle messages where the user returns from the away state.
+     * @param userName The user that is marked to be away
+     * @since 5.0.1
+     */
+    public void issueAway(@NotNull String userName) {
+        final Message msg = new Message(userName, "", MessageType.AWAY);
+        mediumProcessors.forEach(proc -> proc.process(msg));
+        lateProcessors.forEach(proc -> proc.process(msg));
+        MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
+    }
+
+    /**
+     * Issues and processes an away message where as the user
+     * @param userName The name of the user that is no longer away
+     * @since 5.0.1
+     */
+    public void issueBack(@NonNull String userName) {
+        final Message msg = new Message(userName, "", MessageType.BACK);
         mediumProcessors.forEach(proc -> proc.process(msg));
         lateProcessors.forEach(proc -> proc.process(msg));
         MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());
