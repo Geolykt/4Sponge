@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.github.Minestom</groupId>
             <artifactId>Minestom</artifactId>
-            <version>460813b6e0</version>
+            <version>8d946b70ac</version>
             <scope>provided</scope>
             <!-- something that bricks maven ... -->
             <exclusions>
