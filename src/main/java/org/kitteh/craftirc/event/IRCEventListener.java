@@ -42,6 +42,8 @@ public class IRCEventListener {
     protected final boolean handleChat, handleJoins, handleQuits, handleKicks, handleAways;
 
     /**
+     * @deprecated Replaced with {@link #IRCEventListener(IRC2Minestom, boolean, boolean, boolean, boolean, boolean)}
+     *
      * Creates a new IRCEventListener that listens only for chat interactions
      * @param irc2m The IRC to Minestom bridge to use
      * @since 5.0.0

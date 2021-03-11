@@ -156,7 +156,7 @@ public class IRC2Minestom {
         final PreprocessedMessage preMSG = new PreprocessedMessage(messageContent, playername);
         earliestProcessors.forEach(proc -> proc.preProcess(preMSG));
         earlyProcessors.forEach(proc -> proc.preProcess(preMSG));
-        final Message msg = new Message(playername, preMSG.getMessage());
+        final Message msg = new Message(playername, preMSG.getMessage(), MessageType.CHAT);
         mediumProcessors.forEach(proc -> proc.process(msg));
         lateProcessors.forEach(proc -> proc.process(msg));
         MinecraftServer.getConnectionManager().broadcastMessage(msg.getMessage());

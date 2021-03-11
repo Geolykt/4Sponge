@@ -84,7 +84,7 @@ public final class CraftIRC extends Extension {
                         this.dontMakeAGrownManCry();
                         this.startMeUp();
                         this.reloading = false;
-                    }).delay(1, TimeUnit.TICK);
+                    }).delay(1, TimeUnit.TICK).schedule();
                 }
             default:
                 

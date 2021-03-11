@@ -49,7 +49,7 @@ public final class IRCColor implements Preprocessor {
     }
 
     public static final char IRC_COLOR_ESCAPE_SEQUENCE = 0x03; // Also known as ETX (End of text), often represented as ^C
-    public static final char MC_COLOR_ESCAPE_SEQUENCE = 0xA7; // Also known as the paragraph sign, often represented as §
+    public static final char MC_COLOR_ESCAPE_SEQUENCE = 0xA7; // Also known as the paragraph sign, often represented as '§'
 
     // Using mIRC's specifications (https://www.mirc.com/colors.html)
     public static final ImmutableMap<Character, String> MC_TO_IRC = new ImmutableMap.Builder<Character, String>()
