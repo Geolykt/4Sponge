@@ -72,7 +72,7 @@ public final class CraftIRC extends Extension {
             if (!commandSource.hasPermission(PERMISSION_RELOAD)) {
                 return;
             }
-            String arg = args.getString("arg");
+            String arg = args.get("arg").toString();
             switch (arg) {
             case "reload":
                 if (this.reloading) {
@@ -181,11 +181,7 @@ public final class CraftIRC extends Extension {
             File outFile = new File(dataFolder, "config.yml");
             OutputStream output = new FileOutputStream(outFile);
 
-            byte[] buffer = new byte[1024];
-            int lengthRead;
-            while ((lengthRead = input.read(buffer)) > 0) {
-                output.write(buffer, 0, lengthRead);
-            }
+            input.transferTo(output);
 
             output.close();
             input.close();

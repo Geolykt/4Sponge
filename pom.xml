@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.kitteh.irc</groupId>
             <artifactId>client-lib</artifactId>
-            <version>7.3.0</version>
+            <version>7.4.0</version>
             <type>jar</type>
             <scope>compile</scope>
             <exclusions>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.github.Minestom</groupId>
             <artifactId>Minestom</artifactId>
-            <version>8d946b70ac</version>
+            <version>68ef3e31af</version>
             <scope>provided</scope>
             <!-- something that bricks maven ... -->
             <exclusions>
@@ -99,6 +99,11 @@
                 <exclusion>
                     <groupId>com.google.code.findbugs</groupId>
                     <artifactId>jsr305</artifactId>
+                </exclusion>
+                <exclusion>
+                     <!-- This artifact takes ages to download, so we exclude it for the sake of speed -->
+                     <groupId>org.rocksdb</groupId>
+                     <artifactId>rocksdbjni</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
