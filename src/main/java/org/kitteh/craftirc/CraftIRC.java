@@ -28,6 +28,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.chat.ChatColor;
 import net.minestom.server.chat.ColoredText;
 import net.minestom.server.command.builder.Command;
+import net.minestom.server.command.builder.arguments.Argument;
 import net.minestom.server.command.builder.arguments.ArgumentString;
 import net.minestom.server.extensions.Extension;
 import net.minestom.server.utils.time.TimeUnit;
@@ -67,12 +68,13 @@ public final class CraftIRC extends Extension {
 
     @Override
     public void initialize() {
+        Argument<?> argObj = new ArgumentString("arg");
         Command mainCommand = new Command("craftirc");
         mainCommand.addSyntax((commandSource, args) -> {
             if (!commandSource.hasPermission(PERMISSION_RELOAD)) {
                 return;
             }
-            String arg = args.get("arg").toString();
+            String arg =  args.getRaw(argObj).toString();
             switch (arg) {
             case "reload":
                 if (this.reloading) {
@@ -89,7 +91,7 @@ public final class CraftIRC extends Extension {
             default:
                 
             }
-        }, new ArgumentString("arg"));
+        }, argObj);
         mainCommand.setDefaultExecutor((commandSource, args) -> {
             commandSource.sendMessage(ChatColor.CYAN + "CraftIRC version " + ChatColor.RESET + this.version + ChatColor.CYAN +  " - Powered by Kittens\n"
                     + ChatColor.DARK_CYAN + "Original by mbaxter, ported to minestom by geolykt.");
